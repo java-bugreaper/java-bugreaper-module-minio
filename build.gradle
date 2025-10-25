@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.gitlab.ambu550:bugreaper-core:0.0.3'
+    implementation 'io.gitlab.ambu550:bugreaper-core:0.0.4'
 
     implementation 'io.minio:minio:8.5.17'
 
@@ -92,7 +92,7 @@ publishing {
             pom {
                 name = 'bugreaper-module-minio'
                 description = 'BugReaper module for interaction with Minio'
-                url = 'https://ambu550.gitlab.io/java-bugreaper-module-minio/'
+                url = properties["GITLAB_PATH"].toString()
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -108,10 +108,14 @@ publishing {
                     }
                 }
                 scm {
-                    url = 'https://gitlab.com/ambu550/java-bugreaper-module-minio'
+                    url = properties["GITLAB_PATH"].toString()
                 }
             }
         }
+        mavenJavaBase(MavenPublication) {
+            from components.java
+        }
+
     }
     repositories {
         maven {
@@ -132,8 +136,9 @@ publishing {
             // for signing by key
             signing {
                 useGpgCmd()
-//                sign configurations.runtimeElements
-//                sign(publishing.publications.mavenJava)
+               // sign configurations.runtimeElements
+                //only for mavenJava publication
+                sign(publishing.publications.mavenJava)
             }
         }
 

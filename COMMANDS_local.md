@@ -21,12 +21,12 @@
 
 - publish package to GitLab no checksum
 ```shell script
-./gradlew -Dorg.gradle.internal.publish.checksums.insecure=true publishMavenJavaPublicationToGitlabRepository
+./gradlew -Dorg.gradle.internal.publish.checksums.insecure=true publishMavenJavaBasePublicationToGitlabRepository
 ```
 
 - local build for central publish
 ```shell script
-./gradlew publishMavenJavaPublicationToLocalWithChecksumsRepository
+./gradlew clean publishMavenJavaPublicationToLocalWithChecksumsRepository
 ```
 - remove data & prepare archive
 ```shell script
