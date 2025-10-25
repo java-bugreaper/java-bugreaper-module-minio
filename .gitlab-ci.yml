@@ -69,5 +69,5 @@ publish:
   before_script:
     - sed -i "s/PUSH_TOKEN/${CI_PUSH_TOKEN}/g" build.gradle
   script:
-    - ./gradlew -Dorg.gradle.internal.publish.checksums.insecure=true publishMavenJavaPublicationToGitlabRepository
+    - ./gradlew -Dorg.gradle.internal.publish.checksums.insecure=true publishMavenJavaBasePublicationToGitlabRepository
   only: [tags ]
