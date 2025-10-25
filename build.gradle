@@ -1,0 +1,142 @@
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'jacoco'
+    id "org.sonarqube" version "6.3.1.5724"
+    id 'signing'
+}
+
+
+group = 'io.gitlab.ambu550'
+description = "testhelper for interact with minio"
+
+version = properties["VERSION_NAME"].toString()
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withJavadocJar()
+    withSourcesJar()
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.gitlab.ambu550:bugreaper-core:0.0.3'
+
+    implementation 'io.minio:minio:8.5.17'
+
+    testImplementation "org.testcontainers:testcontainers-minio:2.0.0"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
+}
+
+test {
+    useJUnitPlatform()
+
+    systemProperties(System.getProperties())
+
+    testLogging {
+        events("PASSED", "FAILED", "SKIPPED")
+        showStandardStreams = true
+        exceptionFormat = "full"
+    }
+
+    test.outputs.upToDateWhen { false }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+
+    dependsOn(test)
+    executionData fileTree(dir: "${buildDir}/jacoco", include: "*.exec")
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.register('generateJavadoc', Javadoc) {
+
+    destinationDir = file("${buildDir}/docs/javadoc")
+    classpath = project.sourceSets.main.runtimeClasspath
+
+    source = sourceSets.main.allJava
+}
+
+
+publishing {
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            pom {
+                name = 'bugreaper-module-minio'
+                description = 'BugReaper module for interaction with Minio'
+                url = 'https://ambu550.gitlab.io/java-bugreaper-module-minio/'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'ambu550'
+                        name = 'Oleksii Betin'
+                        email = 'ambulance003@ukr.net'
+                        url = 'https://www.linkedin.com/in/ambu550/'
+                    }
+                }
+                scm {
+                    url = 'https://gitlab.com/ambu550/java-bugreaper-module-minio'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url =  uri("https://gitlab.com/api/v4/projects/75551128/packages/maven")
+            name = "Gitlab"
+            credentials(HttpHeaderCredentials) {
+                name = 'Private-Token'
+                value = 'PUSH_TOKEN'
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+
+        maven {
+            name = "localWithChecksums"
+            url = uri(layout.buildDirectory.dir("central-package"))
+            // for signing by key
+            signing {
+                useGpgCmd()
+//                sign configurations.runtimeElements
+//                sign(publishing.publications.mavenJava)
+            }
+        }
+
+    }
+}
+

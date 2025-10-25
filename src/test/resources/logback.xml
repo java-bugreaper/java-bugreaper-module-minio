@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>utf-8</charset>
+            <Pattern>%d [%thread][%-5level] %class %method %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+
+<!--<logger name="org.apache.activemq.artemis.api.core" level="DEBUG" />-->
+    <logger name="bugreaper-module-minio" level="DEBUG" />
+    <logger name="com.github.dockerjava.zerodep.shaded" level="INFO" />
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+
+    </root>
+
+</configuration>
