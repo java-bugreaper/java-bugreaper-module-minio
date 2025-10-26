@@ -56,7 +56,7 @@ class MinioConfigureTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket-2000> expected to be exactly <3> ==> expected: <3> but was: <2> within 2 seconds."));
+                StringContains.containsString("Count objects from bucket <count-bucket-2000> expected to be exactly <3> ==> expected: <3> but got: <2> within 2 seconds."));
     }
 
     @Test
@@ -73,7 +73,7 @@ class MinioConfigureTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket-200> expected to be exactly <2> ==> expected: <2> but was: <1> within 200 milliseconds."));
+                StringContains.containsString("Count objects from bucket <count-bucket-200> expected to be exactly <2> ==> expected: <2> but got: <1> within 200 milliseconds."));
     }
     @Test
     void objectCountAssertPassedAwaitTest() {

@@ -19,9 +19,9 @@ for interact with the MINIO
 
     minio/minio:RELEASE.2025-09-07T16-13-09Z
 
-### Real examples:
-- [Report minio] - in progress
-- [Tests] - in progress
+## Real examples here:
+- ### [Report-minio](https://ambu550.gitlab.io/java-bugreaper-sandbox/#behaviors)
+- ### [Tests](https://gitlab.com/ambu550/java-bugreaper-sandbox/-/tree/main/java-test-part1)
 
 ### Dependencies
 | Lib                                                               | Version | Description       |
