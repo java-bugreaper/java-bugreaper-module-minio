@@ -24,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -52,9 +53,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link Minio#seeBucketNotExists(String)},
  * {@link Minio#seeObjectExists(String, String)},
  * {@link Minio#seeObjectNotExists(String, String)},
- * {@link Minio#assertCountObjectsInBucketExactly(String, int)},
- * {@link Minio#assertCountObjectsInBucketGreater(String, int)},
- * {@link Minio#assertCountObjectsInBucketLess(String, int)}
+ * {@link Minio#seeObjectSizeExactly(String, String, long)},
+ * {@link Minio#seeObjectSizeGreater(String, String, long)},
+ * {@link Minio#seeObjectSizeLess(String, String, long)},
+ * {@link Minio#seeCountObjectsInBucketExactly(String, int)},
+ * {@link Minio#seeCountObjectsInBucketGreater(String, int)},
+ * {@link Minio#seeCountObjectsInBucketLess(String, int)}
  *
  * <p> Upload data:
  * {@link Minio#uploadFileToBucket(String, String)}
@@ -84,8 +88,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class Minio implements MinioInt, MinioConfig {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
+    private static final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     private final MinioClient minioCl;
+
+
     private final String resPath = getResourcesPath();
 
     /**
@@ -160,11 +167,17 @@ public class Minio implements MinioInt, MinioConfig {
         return this;
     }
 
-    
 
+    /**
+     * get resource path & cut build/target part (to get rel path to resources if there is project in project)
+     * <P> WARNING! if in tests there are custom build dir it`s not work
+     */
     private String getResourcesPath() {
-        File file = new File("");
-        return file.getAbsolutePath() + "/src/test/resources/";
+        String classResourcesPath = String.valueOf(Path.of(Objects.requireNonNull(classLoader.getResource("")).getPath()));
+        classResourcesPath = classResourcesPath.replaceAll("/build/.*", "");
+        classResourcesPath = classResourcesPath.replaceAll("/target/.*", "");
+        classResourcesPath = classResourcesPath + "/src/test/resources/";
+        return classResourcesPath;
     }
 
 
@@ -555,7 +568,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> contains exactly {expectedCount} objects")
-    public void assertCountObjectsInBucketExactly(String bucketName, int expectedCount) {
+    public void seeCountObjectsInBucketExactly(String bucketName, int expectedCount) {
 
         getObjectsCountInBucket(bucketName);
 
@@ -564,12 +577,12 @@ public class Minio implements MinioInt, MinioConfig {
                         assertAll(() -> assertEquals(
                                 expectedCount,
                                 getObjectsListNoReport(bucketName).size(),
-                                MessageFormat.format("Count objects from bucket <{0}> expected be exactly <{1}>", bucketName, expectedCount))));
+                                MessageFormat.format("Count objects from bucket <{0}> expected to be exactly <{1}>", bucketName, expectedCount))));
 
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> contains great then {expectedCount} objects")
-    public void assertCountObjectsInBucketGreater(String bucketName, int expectedCount) {
+    public void seeCountObjectsInBucketGreater(String bucketName, int expectedCount) {
 
         getObjectsCountInBucket(bucketName);
 
@@ -577,13 +590,13 @@ public class Minio implements MinioInt, MinioConfig {
                 .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                         assertAll(() -> Assertions.assertTrue(
                                 getObjectsListNoReport(bucketName).size() > expectedCount,
-                                MessageFormat.format("Count objects from bucket <{0}> expected be greater <{1}> but was <{2}>",
+                                MessageFormat.format("Count objects from bucket <{0}> expected to be greater <{1}> but was <{2}>",
                                         bucketName, expectedCount, getObjectsListNoReport(bucketName).size())))
                 );
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> contains less then {expectedCount} objects")
-    public void assertCountObjectsInBucketLess(String bucketName, int expectedCount) {
+    public void seeCountObjectsInBucketLess(String bucketName, int expectedCount) {
 
         getObjectsCountInBucket(bucketName);
 
@@ -591,10 +604,37 @@ public class Minio implements MinioInt, MinioConfig {
                 .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                         assertAll(() -> Assertions.assertTrue(
                                 getObjectsListNoReport(bucketName).size() < expectedCount,
-                                MessageFormat.format("Count objects from bucket <{0}> expected be less <{1}> but was <{2}>",
+                                MessageFormat.format("Count objects from bucket <{0}> expected to be less <{1}> but was <{2}>",
                                         bucketName, expectedCount, getObjectsListNoReport(bucketName).size())))
                 );
 
+    }
+
+
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size exactly: {expectedSize}")
+    public void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize) {
+
+        assertEquals(
+                expectedSize,
+                getObjectSize(bucketName, objectName),
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be equal <{2}>",
+                        objectName, bucketName, expectedSize));
+    }
+
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {expectedSize}")
+    public void seeObjectSizeGreater(String bucketName, String objectName, long expectedSize) {
+        Assertions.assertTrue(
+                getObjectSize(bucketName, objectName) > expectedSize,
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}>",
+                        objectName, bucketName, expectedSize));
+    }
+
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {expectedSize}")
+    public void seeObjectSizeLess(String bucketName, String objectName, long expectedSize) {
+        Assertions.assertTrue(
+                getObjectSize(bucketName, objectName) < expectedSize,
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}>",
+                        objectName, bucketName, expectedSize));
     }
 
     // private sub-methods

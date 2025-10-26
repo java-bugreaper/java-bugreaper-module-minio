@@ -14,7 +14,7 @@
 ./gradlew generateJavadoc
 ```
 
-- publish package to mavenlocal()
+- publish package to mavenLocal()
 ```shell script
 ./gradlew publishToMavenLocal
 ```

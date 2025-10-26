@@ -26,6 +26,6 @@ for interact with the MINIO
 ### Dependencies
 | Lib                                                               | Version | Description       |
 |-------------------------------------------------------------------|---------|-------------------|
-| [bugreaper-core](https://ambu550.gitlab.io/java-bugreaper-core)   | 0.0.4   | bugreaper CORE    |
+| [bugreaper-core](https://ambu550.gitlab.io/java-bugreaper-core)   | 0.0.5   | bugreaper CORE    |
 | [Minio Client](https://mvnrepository.com/artifact/io.minio/minio) | 8.5.17  | Minio Java client |
 

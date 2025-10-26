@@ -51,12 +51,12 @@ class MinioConfigureTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minio.assertCountObjectsInBucketExactly(bucket,3));
+                minio.seeCountObjectsInBucketExactly(bucket,3));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket-2000> expected be exactly <3> ==> expected: <3> but was: <2> within 2 seconds."));
+                StringContains.containsString("Count objects from bucket <count-bucket-2000> expected to be exactly <3> ==> expected: <3> but was: <2> within 2 seconds."));
     }
 
     @Test
@@ -68,12 +68,12 @@ class MinioConfigureTests {
 
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minioAwait.assertCountObjectsInBucketExactly(bucket,2));
+                minioAwait.seeCountObjectsInBucketExactly(bucket,2));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket-200> expected be exactly <2> ==> expected: <2> but was: <1> within 200 milliseconds."));
+                StringContains.containsString("Count objects from bucket <count-bucket-200> expected to be exactly <2> ==> expected: <2> but was: <1> within 200 milliseconds."));
     }
     @Test
     void objectCountAssertPassedAwaitTest() {
@@ -84,7 +84,7 @@ class MinioConfigureTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
-        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> minio.assertCountObjectsInBucketExactly(bucket,3));
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> minio.seeCountObjectsInBucketExactly(bucket,3));
         CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> pushWithSleep(bucket));
 
         CompletableFuture.allOf(future1, future2).join();

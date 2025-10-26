@@ -3,6 +3,7 @@ package io.bugreaper.modules.minio.interfaces;
 import io.bugreaper.core.assertable.AssertableStringList;
 import io.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.awaitility.core.ConditionTimeoutException;
+import org.opentest4j.AssertionFailedError;
 
 
 /**
@@ -20,7 +21,7 @@ public interface MinioInt {
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void assertCountObjectsInBucketExactly(String bucketName, int expectedCount);
+    void seeCountObjectsInBucketExactly(String bucketName, int expectedCount);
 
     /**
      * Assert number of objects in bucket greater than expected (with await)
@@ -30,7 +31,7 @@ public interface MinioInt {
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void assertCountObjectsInBucketGreater(String bucketName, int expectedCount);
+    void seeCountObjectsInBucketGreater(String bucketName, int expectedCount);
 
     /**
      * Assert number of objects in bucket less than expected (with await)
@@ -40,7 +41,7 @@ public interface MinioInt {
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void assertCountObjectsInBucketLess(String bucketName, int expectedCount);
+    void seeCountObjectsInBucketLess(String bucketName, int expectedCount);
 
     /**
      * Delete all objects in bucket
@@ -210,6 +211,40 @@ public interface MinioInt {
      * @throws MinioHelperException on other Minio errors
      */
     void seeObjectNotExists(String bucketName, String objectName);
+
+
+    /**
+     * Assert size of objects in bucket exactly as expected
+     *
+     * @param bucketName    bucket name
+     * @param objectName    object path/name
+     * @param expectedSize expected size in bytes
+     * @throws AssertionFailedError on assert fail
+     * @throws MinioHelperException    on other Minio errors
+     */
+    void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize);
+
+    /**
+     * Assert size of objects in bucket greater than expected
+     *
+     * @param bucketName    bucket name
+     * @param objectName    object path/name
+     * @param expectedSize expected size in bytes
+     * @throws AssertionFailedError on assert fail
+     * @throws MinioHelperException    on other Minio errors
+     */
+    void seeObjectSizeGreater(String bucketName, String objectName, long expectedSize);
+
+    /**
+     * Assert size of objects in bucket less than expected
+     *
+     * @param bucketName    bucket name
+     * @param objectName    object path/name
+     * @param expectedSize expected size in bytes
+     * @throws AssertionFailedError on assert fail
+     * @throws MinioHelperException    on other Minio errors
+     */
+    void seeObjectSizeLess(String bucketName, String objectName, long expectedSize);
 
     /**
      * Share object and return url

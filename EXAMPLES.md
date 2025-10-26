@@ -1,5 +1,31 @@
 # Examples of usage
 
+
+#### Simple use in tests
+```
+import io.bugreaper.modules.minio.Minio;
+
+public class MyTests {
+    Minio minio = new Minio(host, port, username, password)
+    
+    ..use base methods from Minio as is (minio.XXX)
+}  
+```
+
+#### Create object with extend:
+```
+import io.bugreaper.modules.minio.Minio;
+
+public class MinioSetup extends Minio {
+
+    public MinioSetup() {
+        super(host, port, username, password);
+    }
+    
+    ..use base methods from Minio as is (minio.XXX)
+}  
+```
+
 #### Create object with secondary methods:
 ```
 import io.bugreaper.modules.minio.Minio;
@@ -28,38 +54,26 @@ public class MinioSetup {
 
 #### Create object with base methods & Singleton:
 ```
+//TODO
+
 import io.bugreaper.modules.minio.Minio;
 
-public class MinioSetup {
+    private static MinioSetup instance;
+    private final Minio minio;
 
-    private static MinioSetup INSTANCE;
+
+    public  MinioSetup() {
+        this.minio = new Minio(host, port, username, password);
+    }
 
     public static MinioSetup getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MinioSetup();
+        if (instance == null) {
+            instance = new MinioSetup();
         }
 
-        return INSTANCE;
+        return instance;
     }
 
-    public Minio getMinio() {
-        return new Minio(host, port, username, password);
-    }
-    
-    ..use base methods from Minio as is
-}  
-```
-
-#### Create object with extend:
-```
-import io.bugreaper.modules.minio.Minio;
-
-public class MinioSetup extends Minio {
-
-    public MinioSetup() {
-        super(host, port, username, password);
-    }
-    
     ..use base methods from Minio as is
 }  
 ```
@@ -115,9 +129,9 @@ void test() {
     
     minio.seeBucketIsNotEmpty(DEFAULT_BUCKET);                                 
     minio.seeObjectExists(DEFAULT_BUCKET, "test_file_1.txt");                 
-    minio.assertCountObjectsInBucketExactly(DEFAULT_BUCKET, 1);                      
-    minio.assertCountObjectsInBucketGreater(DEFAULT_BUCKET, 0);                      
-    minio.assertCountObjectsInBucketLess(DEFAULT_BUCKET, 3);                      
+    minio.seeCountObjectsInBucketExactly(DEFAULT_BUCKET, 1);                      
+    minio.seeCountObjectsInBucketGreater(DEFAULT_BUCKET, 0);                      
+    minio.seeCountObjectsInBucketLess(DEFAULT_BUCKET, 3);                      
 
 }
 ```

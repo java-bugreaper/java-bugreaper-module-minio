@@ -155,6 +155,22 @@ class MinioBaseTests {
     }
 
     @Test
+    void seeObjectSizeExactlyGreaterLessTest() {
+        String fileName = "temp/test_size.txt";
+        String object = "object_size.txt";
+        long expectedBytes = 180;
+
+        createResourceFileWithSize(fileName, expectedBytes);
+
+        minio.uploadFileToBucket(DEFAULT_BUCKET, fileName, object);
+
+        minio.seeObjectSizeExactly(DEFAULT_BUCKET, object, expectedBytes);
+        minio.seeObjectSizeGreater(DEFAULT_BUCKET, object, expectedBytes - 1);
+        minio.seeObjectSizeLess(DEFAULT_BUCKET, object, expectedBytes + 1);
+
+    }
+
+    @Test
     void getObjectsListTest() {
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "test/object2.txt");
@@ -182,7 +198,7 @@ class MinioBaseTests {
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "test/object2.txt");
 
-        minio.assertCountObjectsInBucketExactly(DEFAULT_BUCKET, 2);
+        minio.seeCountObjectsInBucketExactly(DEFAULT_BUCKET, 2);
     }
 
     @Test
@@ -239,7 +255,7 @@ class MinioBaseTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
-        minio.assertCountObjectsInBucketGreater(bucket, 1);
+        minio.seeCountObjectsInBucketGreater(bucket, 1);
 
     }
 
@@ -252,7 +268,7 @@ class MinioBaseTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
-        minio.assertCountObjectsInBucketLess(bucket, 3);
+        minio.seeCountObjectsInBucketLess(bucket, 3);
 
     }
 
