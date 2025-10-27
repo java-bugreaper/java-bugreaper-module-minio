@@ -118,7 +118,7 @@ public class Minio implements MinioInt, MinioConfig {
     /**
      * CThis constructor initializes client for interaction with Minio
      *
-     * @param host host of Minio
+     * @param host host of Minio ("http://your-minio-host")
      * @param port port of Minio
      * @param username admin username
      * @param password  admin password
@@ -129,7 +129,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     private MinioClient createConnect(String host, int port, String username, String password) {
         return MinioClient.builder()
-                .endpoint("http://" + host + ":" + port)
+                .endpoint(host + ":" + port)
                 .credentials(username, password)
                 .build();
     }
@@ -183,29 +183,29 @@ public class Minio implements MinioInt, MinioConfig {
 
     // Upload
 
-    @Step("(Minio) Upload file:filePath to bucket:<bucketName>")
-    public void uploadFileToBucket(String bucketName, String filePath) {
+    @Step("(Minio) Upload file: {filePathName} to bucket:<{bucketName}>")
+    public void uploadFileToBucket(String bucketName, String filePathName) {
 
-        Path path = Paths.get(filePath);
+        Path path = Paths.get(filePathName);
         String fileName = path.getFileName().toString();
 
-        uploadFileToBucket(bucketName, filePath, fileName);
+        uploadFileToBucket(bucketName, filePathName, fileName);
     }
 
-    @Step("(Minio) Upload file:filePath to bucket:<bucketName> like object:<objectName>")
-    public void uploadFileToBucket(String bucketName, String filePath, String objectName) {
-        uploadFileToBucket(bucketName, filePath, objectName, "text/plain");
+    @Step("(Minio) Upload file: {filePathName} to bucket:<{bucketName}> like object:<{objectName}>")
+    public void uploadFileToBucket(String bucketName, String filePathName, String objectName) {
+        uploadFileToBucket(bucketName, filePathName, objectName, "text/plain");
     }
 
-    @Step("(Minio) Upload file: <filePathName> to object: <objectName> in bucket: <bucketName>")
-    public void uploadFileToBucket(String bucketName, String filePath, String objectName, String contentType) {
+    @Step("(Minio) Upload file: <{filePathName}> to object: <{objectName}> in bucket: <{bucketName}>")
+    public void uploadFileToBucket(String bucketName, String filePathName, String objectName, String contentType) {
 
-        String resourceFilePath = resPath + filePath;
+        String resourceFilePath = resPath + filePathName;
 
-        if (getResourceFileSize(filePath) > maxUploadFileSize) {
+        if (getResourceFileSize(filePathName) > maxUploadFileSize) {
             throw new MinioHelperException(
                     MessageFormat.format("Upload aborted, file <{0}> size:<{1}> more maximum in config {2}bytes, can be changed by .withMaxUploadSize(int maxUploadSize)",
-                            resourceFilePath, getResourceFileSize(filePath), maxUploadFileSize));
+                            resourceFilePath, getResourceFileSize(filePathName), maxUploadFileSize));
         }
 
         try (FileInputStream fis = new FileInputStream(resourceFilePath)) {
@@ -226,7 +226,7 @@ public class Minio implements MinioInt, MinioConfig {
         }
     }
 
-    @Step("(Minio) Share object: <objectName> from bucket: <bucketName> to file: <filePathName>")
+    @Step("(Minio) Share object: <{objectName}> from bucket: <{bucketName}> to file: <{filePathName}>")
     public String shareObjectInBucket(String bucketName, String objectName) {
         try {
 
@@ -251,7 +251,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     // Download/Read
 
-    @Step("(Minio) Download object: <objectName> from bucket: <bucketName> to file: <filePathName>")
+    @Step("(Minio) Download object: <{objectName}> from bucket: <{bucketName}> to file: <{filePathName}>")
     public void downloadObjectFromBucket(String bucketName, String objectName, String filePathName) {
 
         checkDownloadSize(bucketName, objectName);
@@ -278,7 +278,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     //bug new line in end!
-    @Step("(Minio) Read object: <objectName> from bucket: <bucketName>")
+    @Step("(Minio) Read object: <{objectName}> from bucket: <{bucketName}>")
     public String readObjectFromBucket(String bucketName, String objectName) {
 
         checkDownloadSize(bucketName, objectName);
@@ -318,7 +318,7 @@ public class Minio implements MinioInt, MinioConfig {
     // Create/Delete
 
 
-    @Step("(Minio) Create bucket: <bucketName>")
+    @Step("(Minio) Create bucket: <{bucketName}>")
     public void createBucket(String bucketName) {
 
         try {
@@ -336,7 +336,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
-    @Step("(Minio) Delete empty: <bucketName>")
+    @Step("(Minio) Delete empty: <{bucketName}>")
     public void deleteEmptyBucket(String bucketName) {
 
         try {
@@ -359,13 +359,13 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
-    @Step("(Minio) Delete bucket: <bucketName>")
+    @Step("(Minio) Delete bucket: <{bucketName}>")
     public void deleteFilledBucket(String bucketName) {
         cleanBucket(bucketName);
         deleteEmptyBucket(bucketName);
     }
 
-    @Step("(Minio) Delete object: <bucketName> from bucket: <bucketName>")
+    @Step("(Minio) Delete object: <{objectName}> from bucket: <{bucketName}>")
     public void deleteObjectFromBucket(String bucketName, String objectName) {
 
         try {
@@ -379,7 +379,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
-    @Step("(Minio) Clean bucket: <bucketName>")
+    @Step("(Minio) Clean bucket: <{bucketName}>")
     public void cleanBucket(String bucketName) {
 
         Iterable<Result<Item>> results = getObjectsListMethod(bucketName);
@@ -428,7 +428,7 @@ public class Minio implements MinioInt, MinioConfig {
         }
     }
 
-    @Step("(Minio) Grab objects list in bucket: <bucketName>")
+    @Step("(Minio) Grab objects list from bucket: <{bucketName}>")
     public AssertableStringList getObjectsList(String bucketName) {
         return new AssertableStringList(getObjectsList(bucketName, true));
     }
@@ -567,7 +567,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> contains exactly {expectedCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has exactly {expectedCount} objects")
     public void seeCountObjectsInBucketExactly(String bucketName, int expectedCount) {
 
         getObjectsCountInBucket(bucketName);
@@ -577,11 +577,12 @@ public class Minio implements MinioInt, MinioConfig {
                         assertAll(() -> assertEquals(
                                 expectedCount,
                                 getObjectsListNoReport(bucketName).size(),
-                                MessageFormat.format("Count objects from bucket <{0}> expected to be exactly <{1}>", bucketName, expectedCount))));
+                                MessageFormat.format("Count objects from bucket <{0}> expected to be exactly <{1}> but got <{2}>",
+                                        bucketName, expectedCount, getObjectsListNoReport(bucketName).size()))));
 
     }
 
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> contains great then {expectedCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has great then {expectedCount} objects")
     public void seeCountObjectsInBucketGreater(String bucketName, int expectedCount) {
 
         getObjectsCountInBucket(bucketName);
@@ -590,12 +591,12 @@ public class Minio implements MinioInt, MinioConfig {
                 .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                         assertAll(() -> Assertions.assertTrue(
                                 getObjectsListNoReport(bucketName).size() > expectedCount,
-                                MessageFormat.format("Count objects from bucket <{0}> expected to be greater <{1}> but was <{2}>",
+                                MessageFormat.format("Count objects from bucket <{0}> expected to be greater <{1}> but got <{2}>",
                                         bucketName, expectedCount, getObjectsListNoReport(bucketName).size())))
                 );
     }
 
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> contains less then {expectedCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less then {expectedCount} objects")
     public void seeCountObjectsInBucketLess(String bucketName, int expectedCount) {
 
         getObjectsCountInBucket(bucketName);
@@ -604,7 +605,7 @@ public class Minio implements MinioInt, MinioConfig {
                 .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                         assertAll(() -> Assertions.assertTrue(
                                 getObjectsListNoReport(bucketName).size() < expectedCount,
-                                MessageFormat.format("Count objects from bucket <{0}> expected to be less <{1}> but was <{2}>",
+                                MessageFormat.format("Count objects from bucket <{0}> expected to be less <{1}> but got <{2}>",
                                         bucketName, expectedCount, getObjectsListNoReport(bucketName).size())))
                 );
 
@@ -613,28 +614,27 @@ public class Minio implements MinioInt, MinioConfig {
 
     @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size exactly: {expectedSize}")
     public void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize) {
-
         assertEquals(
                 expectedSize,
                 getObjectSize(bucketName, objectName),
-                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be equal <{2}>",
-                        objectName, bucketName, expectedSize));
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be equal <{2}> bytes but got <{3}>",
+                        objectName, bucketName, expectedSize, getObjectSize(bucketName, objectName)));
     }
 
     @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {expectedSize}")
     public void seeObjectSizeGreater(String bucketName, String objectName, long expectedSize) {
         Assertions.assertTrue(
                 getObjectSize(bucketName, objectName) > expectedSize,
-                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}>",
-                        objectName, bucketName, expectedSize));
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> bytes but got <{3}>",
+                        objectName, bucketName, expectedSize, getObjectSize(bucketName, objectName)));
     }
 
     @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {expectedSize}")
     public void seeObjectSizeLess(String bucketName, String objectName, long expectedSize) {
         Assertions.assertTrue(
                 getObjectSize(bucketName, objectName) < expectedSize,
-                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}>",
-                        objectName, bucketName, expectedSize));
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> bytes but got <{3}>",
+                        objectName, bucketName, expectedSize, getObjectSize(bucketName, objectName)));
     }
 
     // private sub-methods

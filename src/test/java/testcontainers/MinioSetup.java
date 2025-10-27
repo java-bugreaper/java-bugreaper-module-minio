@@ -29,7 +29,7 @@ public class MinioSetup {
 
     public Minio getMinio() {
         return new Minio(
-                container.getHost(),
+                "http://" + container.getHost(),
                 container.getMappedPort(9000),
                 "admin",
                 "password");
@@ -37,7 +37,7 @@ public class MinioSetup {
 
     public Minio getMinio(String user, String pass) {
         return new Minio(
-                container.getHost(),
+                "http://" + container.getHost(),
                 container.getMappedPort(9000),
                 user,
                 pass);

@@ -2,18 +2,20 @@
 
 
 #### Simple use in tests
-```
+
+```java
 import io.bugreaper.modules.minio.Minio;
 
 public class MyTests {
-    Minio minio = new Minio(host, port, username, password)
+    Minio minio = new Minio(host, port, username, password);
     
-    ..use base methods from Minio as is (minio.XXX)
+    //..use base methods from Minio as is (minio.XXX)
 }  
 ```
 
 #### Create object with extend:
-```
+
+```java
 import io.bugreaper.modules.minio.Minio;
 
 public class MinioSetup extends Minio {
@@ -22,12 +24,13 @@ public class MinioSetup extends Minio {
         super(host, port, username, password);
     }
     
-    ..use base methods from Minio as is (minio.XXX)
+    //..use base methods from Minio as is (minio.XXX)
 }  
 ```
 
 #### Create object with secondary methods:
-```
+
+```java
 import io.bugreaper.modules.minio.Minio;
 
 public class MinioSetup {
@@ -48,16 +51,17 @@ public class MinioSetup {
         minio.uploadFileToBucket(TEST_BUCKET, filePath);
     }
     
-    ...other methods with your queue
+    //...other methods with your queue
 }    
 ```
 
 #### Create object with base methods & Singleton:
-```
-//TODO
 
+```java
 import io.bugreaper.modules.minio.Minio;
 
+public class MinioSetup {
+    
     private static MinioSetup instance;
     private final Minio minio;
 
@@ -74,22 +78,24 @@ import io.bugreaper.modules.minio.Minio;
         return instance;
     }
 
-    ..use base methods from Minio as is
+    //..use base methods from Minio as is
 }  
 ```
 
 #### Setup example:
-```
+
+```java
 //if use Singleton
-protected final Minio minio = MinioSetup.getInstance(); 
+private final Minio minio = MinioSetup.getInstance(); 
 
 //if use like object
-protected final Minio minio = new MinioSetup();
+private final Minio minio = new MinioSetup();
 ```
 
 
 #### Test examples with upload & download:
-```
+
+```java
 import static io.bugreaper.core.filereaders.ResourcesFileReader.*;
 
 private static final String DEFAULT_BUCKET = "bucket-for-file";
@@ -116,7 +122,8 @@ void test() {
 
 
 #### Test examples with asserts:
-```
+
+```java
 private static final String DEFAULT_BUCKET = "new-bucket";
 
 @Test
@@ -137,12 +144,12 @@ void test() {
 ```
 
 
-#### Test examples with grab messages from queue:
+#### Test examples with grab list of objects from bucket
 - Assert all list of messages (until at least one matches)
 - [AssertableStringList](https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html) checks:
 - customMatcher for [Strings type](https://hamcrest.org/JavaHamcrest/javadoc/3.0/org/hamcrest/Matchers.html)
-- recommended to clean queue before each test and work with one message (but you can work with as many as needed)
-```
+
+```java
 
 private static final String DEFAULT_BUCKET = "new-bucket";
 private static final String TEST_FILE = "data/test_file_1.txt";
@@ -167,6 +174,6 @@ void test() {
 ### [ALL interactions](https://ambu550.gitlab.io/java-bugreaper-module-minio/io/bugreaper/modules/minio/interfaces/MinioInt.html)
 
 
-### Real examples here:
-- [Report] - in progress
-- [Tests] - in progress
+## Real examples here:
+- ### [Report-minio](https://ambu550.gitlab.io/java-bugreaper-sandbox/#behaviors)
+- ### [Tests](https://gitlab.com/ambu550/java-bugreaper-sandbox/-/tree/main/java-test-part1)

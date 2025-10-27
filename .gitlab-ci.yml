@@ -1,6 +1,6 @@
 stages:
-  - secret-detection
-  - unit-test
+  - pre-check
+  - test
   - build
   - deploy
 
@@ -9,17 +9,38 @@ image: gradle:8.14.2-jdk17
 variables:
   JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
   TZ: Europe/Kiev
-
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
 
 secret_detection:
-  stage: secret-detection
+  stage: pre-check
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
+
+tag_pre_check:
+  stage: pre-check
+  script:
+    - VERSION=$(./gradlew properties | grep "version:" | awk '{print $2}')
+    - if git tag -l "$VERSION" | grep -q "$VERSION"; then
+    -   echo "Error. Tag '$VERSION' already exists. Aborting job."
+    -   exit 1
+    - fi
+    - echo "Tag '$VERSION' does not exist. Proceeding."
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_TAG == null'
+      when: never
+    - when: never
+
+
+
+
 unit-test:
-  stage: unit-test
+  stage: test
   services:
     - name: docker:24.0.7-dind
       command: [ "--tls=false" ]
@@ -36,12 +57,53 @@ unit-test:
   only: [ web, api, merge_requests, main ]
   artifacts:
     when: always
+    paths:
+      - build/reports/jacoco
     reports:
       junit:
         - build/test-results/*/TEST-*.xml
       coverage_report:
         coverage_format: jacoco
         path: build/reports/jacoco/test/jacocoTestReport.xml
+
+sonar:
+  stage: test
+  cache:
+    policy: pull-push
+    key: "sonar-cache-$CI_COMMIT_REF_SLUG"
+    paths:
+      - "${SONAR_USER_HOME}/cache"
+      - sonar-scanner/
+  script: gradle assemble sonar
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+    - when: never
+  needs:
+    - job: unit-test
+      artifacts: true
+
+
+tag_job:
+  stage: deploy
+  dependencies: [ "unit-test" ]
+  script:
+    - PROJECT_VERSION=$(./gradlew properties | grep "version:" | awk '{print $2}')
+    - echo "Creating Git tag. $PROJECT_VERSION"
+    - git config user.email "$EMAIL"
+    - git config user.name "$USERNAME"
+    - git tag -a "$PROJECT_VERSION" -m "Release $PROJECT_VERSION"
+    - git remote set-url origin "https://gitlab-ci-token:${CI_TAG_TOKEN}@gitlab.com/${CI_PROJECT_PATH}.git"
+    - git push origin "$PROJECT_VERSION"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+    - if: '$CI_COMMIT_TAG == null'
+      when: never
+    - when: never
 
 
 site:
@@ -70,4 +132,4 @@ publish:
     - sed -i "s/PUSH_TOKEN/${CI_PUSH_TOKEN}/g" build.gradle
   script:
     - ./gradlew -Dorg.gradle.internal.publish.checksums.insecure=true publishMavenJavaBasePublicationToGitlabRepository
-  only: [tags ]
+  only: [ tags ]

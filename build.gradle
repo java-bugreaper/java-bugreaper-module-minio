@@ -60,6 +60,13 @@ jacocoTestReport {
     }
 }
 
+sonar {
+    properties {
+        property "sonar.projectKey", "java-bugreaper-module-minio"
+        property "sonar.projectName", "java-bugreaper-module-minio"
+        property "sonar.qualitygate.wait", true
+    }
+}
 sonarqube {
     properties {
         property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
