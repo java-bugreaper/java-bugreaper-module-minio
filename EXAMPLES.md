@@ -145,7 +145,7 @@ void test() {
 
 
 #### Test examples with grab list of objects from bucket
-- Assert all list of messages (until at least one matches)
+- Assert all list (until at least one matches then check next in chain)
 - [AssertableStringList](https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html) checks:
 - customMatcher for [Strings type](https://hamcrest.org/JavaHamcrest/javadoc/3.0/org/hamcrest/Matchers.html)
 
