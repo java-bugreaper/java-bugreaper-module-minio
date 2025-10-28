@@ -21,14 +21,16 @@ java {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     api 'io.gitlab.ambu550:bugreaper-core:0.0.5'
 
     api 'io.minio:minio:8.5.17'
+
+    implementation 'org.apiguardian:apiguardian-api:1.1.2'
 
     testImplementation "org.testcontainers:testcontainers-minio:2.0.0"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
@@ -89,6 +91,7 @@ tasks.register('generateJavadoc', Javadoc) {
     source = sourceSets.main.allJava
 }
 
+def projectId = properties["PROJECT_ID"]
 
 publishing {
 
@@ -126,7 +129,7 @@ publishing {
     }
     repositories {
         maven {
-            url =  uri("https://gitlab.com/api/v4/projects/75551128/packages/maven")
+            url =  uri("https://gitlab.com/api/v4/projects/" + projectId + "/packages/maven")
             name = "Gitlab"
             credentials(HttpHeaderCredentials) {
                 name = 'Private-Token'
@@ -151,4 +154,3 @@ publishing {
 
     }
 }
-

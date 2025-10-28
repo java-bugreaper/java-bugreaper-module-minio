@@ -95,12 +95,11 @@ public interface MinioInt {
      * @throws MinioHelperException on Minio errors
      */
     void downloadObjectFromBucket(String bucketName, String objectName, String filePathName);
-
     /**
      * Return list of buckets
      *
      * @return <a href="https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html">AssertableStringList</a>
-     * <p> EXAMPLE: grabMessagesFromQueue("test_queue").testInLIst(stringEqualsInList("email"))
+     * <p> EXAMPLE: getObjectsCountInBucket("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
@@ -130,7 +129,7 @@ public interface MinioInt {
      *
      * @param bucketName bucket name
      * @return <a href="https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html">AssertableStringList</a>
-     * <p> EXAMPLE: grabMessagesFromQueue("test_queue").testInLIst(stringEqualsInList("email"))
+     * <p> EXAMPLE: getObjectsList().testInLIst(stringEqualsInList("my-bucket"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */

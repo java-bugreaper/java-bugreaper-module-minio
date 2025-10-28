@@ -76,10 +76,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link Minio#objectExistsStatus(String, String)},
  * {@link Minio#readObjectFromBucket(String, String)},
  *
- * <p> Await for some counts assert, can be changed by: {@link Minio#withAwaitMs(int)}
- * <p> Buffer for file download, can be changed by: {@link Minio#withDownloadBufferSize(int)})
- * <p> Max read/download object size, can be changed by: {@link Minio#withMaxDownloadObjectSize(int)})
- * <p> Max upload object can be changed can be changed by: {@link Minio#withMaxUploadSize(int)})
+ * <p> Await for some counts assert default: {@link Minio#awaitMs}, can be changed by: {@link Minio#withAwaitMs(int)}
+ * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#withDownloadBufferSize(int)})
+ * <p> Max read/download object size default: {@link Minio#maxDownloadObjectSize}, can be changed by: {@link Minio#withMaxDownloadObjectSize(int)})
+ * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed can be changed by: {@link Minio#withMaxUploadSize(int)})
  *
  * @author Oleksii Betin "ambu550"
  * @since 1.0.0
