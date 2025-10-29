@@ -1,4 +1,3 @@
-
 plugins {
     id 'java-library'
     id 'maven-publish'
@@ -8,9 +7,9 @@ plugins {
 }
 
 
-group = 'io.gitlab.ambu550'
-description = "testhelper for interact with minio"
+description = 'BugReaper module for interaction with Minio'
 
+group = 'io.gitlab.ambu550'
 version = properties["VERSION_NAME"].toString()
 
 java {
@@ -21,8 +20,10 @@ java {
 }
 
 repositories {
+
+    //  mavenLocal()
     mavenCentral()
-    mavenLocal()
+
 }
 
 dependencies {
@@ -64,8 +65,8 @@ jacocoTestReport {
 
 sonar {
     properties {
-        property "sonar.projectKey", "java-bugreaper-module-minio"
-        property "sonar.projectName", "java-bugreaper-module-minio"
+        property "sonar.projectKey", "${project.projectDir.name}"
+        property "sonar.projectName", "${project.projectDir.name}"
         property "sonar.qualitygate.wait", true
     }
 }
@@ -91,8 +92,6 @@ tasks.register('generateJavadoc', Javadoc) {
     source = sourceSets.main.allJava
 }
 
-def projectId = properties["PROJECT_ID"]
-
 publishing {
 
     publications {
@@ -100,9 +99,9 @@ publishing {
             from components.java
 
             pom {
-                name = 'bugreaper-module-minio'
-                description = 'BugReaper module for interaction with Minio'
-                url = properties["GITLAB_PATH"].toString()
+                name = rootProject.name
+                description = "${project.description}"
+                url = "${project.findProperty('SITE_PATH')}"
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -118,7 +117,7 @@ publishing {
                     }
                 }
                 scm {
-                    url = properties["GITLAB_PATH"].toString()
+                    url = "${project.findProperty('GITLAB_PATH')}"
                 }
             }
         }
@@ -127,12 +126,14 @@ publishing {
         }
 
     }
+
+
     repositories {
         maven {
-            url =  uri("https://gitlab.com/api/v4/projects/" + projectId + "/packages/maven")
+            url =  uri("https://gitlab.com/api/v4/projects/${project.findProperty('PROJECT_ID')}/packages/maven")
             name = "Gitlab"
             credentials(HttpHeaderCredentials) {
-                name = 'Private-Token'
+                name = 'Job-Token'
                 value = 'PUSH_TOKEN'
             }
             authentication {
@@ -146,7 +147,7 @@ publishing {
             // for signing by key
             signing {
                 useGpgCmd()
-               // sign configurations.runtimeElements
+                // sign configurations.runtimeElements
                 //only for mavenJava publication
                 sign(publishing.publications.mavenJava)
             }
