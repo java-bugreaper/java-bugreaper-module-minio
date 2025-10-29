@@ -1,6 +1,7 @@
 package io.bugreaper.modules.minio.interfaces;
 
 import io.bugreaper.core.assertable.AssertableStringList;
+import io.bugreaper.core.assertable.stringlist.ListOperators;
 import io.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.awaitility.core.ConditionTimeoutException;
 import org.opentest4j.AssertionFailedError;
@@ -98,8 +99,9 @@ public interface MinioInt {
     /**
      * Return list of buckets
      *
-     * @return <a href="https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html">AssertableStringList</a>
-     * <p> EXAMPLE: getObjectsCountInBucket("my-bucket").testInLIst(stringEqualsInList("my_object"))
+     * @return {@link AssertableStringList} (use with {@link ListOperators})
+     * <p> EXAMPLE:
+     * <p>getObjectsCountInBucket("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
@@ -128,8 +130,9 @@ public interface MinioInt {
      * Return list of objects(with path) from bucket
      *
      * @param bucketName bucket name
-     * @return <a href="https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html">AssertableStringList</a>
-     * <p> EXAMPLE: getObjectsList().testInLIst(stringEqualsInList("my-bucket"))
+     * @return {@link AssertableStringList} (use with {@link ListOperators})
+     * <p> EXAMPLE:
+     * <p>getObjectsCountInBucket("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
