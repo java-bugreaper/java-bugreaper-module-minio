@@ -9,6 +9,7 @@ import testcontainers.MinioSetup;
 
 
 import static io.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -97,12 +98,12 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket> expected to be exactly <3> but got <2> ==> expected: <3> but was: <2> within 2 seconds"));
+                is("Count objects from bucket <count-bucket> expected to be EXACTLY <3> but got <2> within 2 seconds"));
     }
 
     @Test
     void greaterLessFailedTest() {
-        String bucket = "bucket-greater";
+        String bucket = "bucket-less";
         minio.createBucket(bucket);
         minio.cleanBucket(bucket);
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
@@ -114,12 +115,12 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count greater in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <bucket-greater> expected to be less <1> but got <2>"));
+                is("Count objects from bucket <bucket-less> expected to be LESS than <1> but got <2> within 2 seconds"));
     }
 
     @Test
     void greaterCountFailedTest() {
-        String bucket = "bucket-less";
+        String bucket = "bucket-greater";
         minio.createBucket(bucket);
         minio.cleanBucket(bucket);
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
@@ -131,7 +132,7 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count greater in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <bucket-less> expected to be greater <2> but got <2>"));
+                is("Count objects from bucket <bucket-greater> expected to be GREATER than <2> but got <2> within 2 seconds"));
     }
 
     @Test

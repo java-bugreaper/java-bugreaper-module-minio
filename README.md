@@ -2,7 +2,7 @@
 
 for interact with the MINIO
 
-## [apiDOC](https://ambu550.gitlab.io/java-bugreaper-module-minio)
+## [apiDOC](https://bug-reaper.gitlab.io/java-bugreaper-module-minio/)
 
 ### [EXAMPLES.md](EXAMPLES.md)
 
@@ -20,12 +20,12 @@ for interact with the MINIO
     minio/minio:RELEASE.2025-09-07T16-13-09Z
 
 ## Real examples here:
-- ### [Report-minio](https://ambu550.gitlab.io/java-bugreaper-sandbox/#behaviors)
-- ### [Tests](https://gitlab.com/ambu550/java-bugreaper-sandbox/-/tree/main/java-test-part1)
+- ### [Report-minio](https://bug-reaper.gitlab.io/java-bugreaper-sandbox/#behaviors)
+- ### [Tests](https://gitlab.com/bug-reaper/java-bugreaper-sandbox/-/tree/main/java-test-part1)
 
 ### Dependencies
-| Lib                                                               | Version | Description       |
-|-------------------------------------------------------------------|---------|-------------------|
-| [bugreaper-core](https://ambu550.gitlab.io/java-bugreaper-core)   | 0.0.5   | bugreaper CORE    |
-| [Minio Client](https://mvnrepository.com/artifact/io.minio/minio) | 8.5.17  | Minio Java client |
+| Lib                                                                                   | Version   | Description       |
+|---------------------------------------------------------------------------------------|-----------|-------------------|
+| [bugreaper-core](https://mvnrepository.com/artifact/io.gitlab.ambu550/bugreaper-core) | 0.0.6-rc2 | bugreaper CORE    |
+| [Minio Client](https://mvnrepository.com/artifact/io.minio/minio)                     | 8.5.17    | Minio Java client |
 

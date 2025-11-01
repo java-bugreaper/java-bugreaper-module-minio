@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static java.lang.Thread.sleep;
 import static io.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MinioConfigureTests {
 
     private static final Minio minio = MinioSetup.getInstance().getMinio().withDownloadBufferSize(1000);
-    private static final Minio minioAwait = MinioSetup.getInstance().getMinio().withAwaitMs(200);
+
 
     private static final Minio minioDownload = MinioSetup.getInstance().getMinio()
             .withMaxDownloadObjectSize(10);
@@ -56,11 +57,13 @@ class MinioConfigureTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket-2000> expected to be exactly <3> but got <2> ==> expected: <3> but was: <2> within 2 seconds."));
+                is("Count objects from bucket <count-bucket-2000> expected to be EXACTLY <3> but got <2> within 2 seconds"));
     }
 
     @Test
     void objectCountAssertFailedCustomAwaitTest() {
+        final Minio minioAwait = MinioSetup.getInstance().getMinio().withAwaitMs(200);
+
         var bucket = "count-bucket-200";
         minioAwait.createBucket(bucket);
 
@@ -73,8 +76,28 @@ class MinioConfigureTests {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                StringContains.containsString("Count objects from bucket <count-bucket-200> expected to be exactly <2> but got <1> ==> expected: <2> but was: <1> within 200 milliseconds."));
+                is("Count objects from bucket <count-bucket-200> expected to be EXACTLY <2> but got <1> within 200 milliseconds"));
     }
+
+    @Test
+    void objectCountAssertFailedCustomAwait2Test() {
+        final Minio minioAwait = MinioSetup.getInstance().getMinio().withAwaitMs(1200);
+
+        var bucket = "count-bucket-1200";
+        minioAwait.createBucket(bucket);
+
+        minioAwait.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
+
+
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+                minioAwait.seeCountObjectsInBucketExactly(bucket,2));
+
+        MatcherAssert.assertThat(
+                "Error on assert objects count in bucket",
+                exception.getMessage(),
+                is("Count objects from bucket <count-bucket-1200> expected to be EXACTLY <2> but got <1> within 1 second 200 milliseconds"));
+    }
+
     @Test
     void objectCountAssertPassedAwaitTest() {
         var bucket = "count-bucket-2000-pass";

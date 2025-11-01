@@ -101,7 +101,7 @@ public interface MinioInt {
      *
      * @return {@link AssertableStringList} (use with {@link ListOperators})
      * <p> EXAMPLE:
-     * <p>getObjectsCountInBucket("my-bucket").testInLIst(stringEqualsInList("my_object"))
+     * <p>getBucketsList("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
@@ -132,7 +132,7 @@ public interface MinioInt {
      * @param bucketName bucket name
      * @return {@link AssertableStringList} (use with {@link ListOperators})
      * <p> EXAMPLE:
-     * <p>getObjectsCountInBucket("my-bucket").testInLIst(stringEqualsInList("my_object"))
+     * <p>getObjectsList("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
