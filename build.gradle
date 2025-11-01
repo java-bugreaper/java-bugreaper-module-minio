@@ -21,13 +21,13 @@ java {
 
 repositories {
 
-    //  mavenLocal()
+    //mavenLocal()
     mavenCentral()
 
 }
 
 dependencies {
-    api 'io.gitlab.ambu550:bugreaper-core:0.0.5'
+    api 'io.gitlab.ambu550:bugreaper-core:0.0.6-rc2'
 
     api 'io.minio:minio:8.5.17'
 
@@ -39,6 +39,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    systemProperty('allure.results.directory', project.buildDir.toString() + "/allure-results")
 
     systemProperties(System.getProperties())
 

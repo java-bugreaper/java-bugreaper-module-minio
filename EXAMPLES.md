@@ -146,7 +146,7 @@ void test() {
 
 #### Test examples with grab list of objects from bucket
 - Assert all list (until at least one matches then check next in chain)
-- [AssertableStringList](https://ambu550.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html) checks:
+- [AssertableStringList](https://bug-reaper.gitlab.io/java-bugreaper-core/apidocs/io/bugreaper/core/assertable/stringlist/ListOperators.html) checks:
 - customMatcher for [Strings type](https://hamcrest.org/JavaHamcrest/javadoc/3.0/org/hamcrest/Matchers.html)
 
 ```java
@@ -171,9 +171,9 @@ void test() {
 }
 ```
 
-### [ALL interactions](https://ambu550.gitlab.io/java-bugreaper-module-minio/io/bugreaper/modules/minio/interfaces/MinioInt.html)
+### [ALL interactions](https://bug-reaper.gitlab.io/java-bugreaper-module-minio/io/bugreaper/modules/minio/Minio.html)
 
 
 ## Real examples here:
-- ### [Report-minio](https://ambu550.gitlab.io/java-bugreaper-sandbox/#behaviors)
-- ### [Tests](https://gitlab.com/ambu550/java-bugreaper-sandbox/-/tree/main/java-test-part1)
+- ### [Report-minio](https://bug-reaper.gitlab.io/java-bugreaper-sandbox/#behaviors)
+- ### [Tests](https://gitlab.com/bug-reaper/java-bugreaper-sandbox/-/tree/main/java-test-part1)

@@ -1,6 +1,7 @@
 package io.bugreaper.modules.minio;
 
 import io.bugreaper.core.assertable.AssertableStringList;
+import io.bugreaper.core.exceptions.AssertionWithAwaitFailedError;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
@@ -11,6 +12,7 @@ import io.qameta.allure.Step;
 import io.bugreaper.modules.minio.exceptions.MinioHelperException;
 import io.bugreaper.modules.minio.interfaces.MinioConfig;
 import io.bugreaper.modules.minio.interfaces.MinioInt;
+import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static io.bugreaper.core.assertions.Asserts.*;
+import static io.bugreaper.core.mappers.StringMappers.formatMilliseconds;
 import static java.time.Duration.ofMillis;
 import static io.bugreaper.core.allurereporter.AllureReporter.attachFromList;
 import static io.bugreaper.core.filereaders.ResourcesFileReader.getResourceFileSize;
@@ -38,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Class consists methods that operate with Minio
  *
- * <p> Buckets/Objects:
+ * <p><b>Buckets/Objects Interaction:</b>
  * {@link Minio#cleanBucket(String)},
  * {@link Minio#createBucket(String)},
  * {@link Minio#deleteEmptyBucket(String)},
@@ -46,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link Minio#deleteObjectFromBucket(String, String)},
  * {@link Minio#shareObjectInBucket(String, String)},
  *
- * <p> Asserts:
+ * <p><b>Asserts:</b>
  * {@link Minio#seeBucketExists(String)},
  * {@link Minio#seeBucketIsEmpty(String)},
  * {@link Minio#seeBucketIsNotEmpty(String)},
@@ -60,15 +64,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link Minio#seeCountObjectsInBucketGreater(String, int)},
  * {@link Minio#seeCountObjectsInBucketLess(String, int)}
  *
- * <p> Upload data:
+ * <p><b>Asserts:</b>
  * {@link Minio#uploadFileToBucket(String, String)}
  * {@link Minio#uploadFileToBucket(String, String, String)}
  * {@link Minio#uploadFileToBucket(String, String, String, String)}
  *
- * <p> Download data:
+ * <p><b>Download data:</b>
  * {@link Minio#downloadObjectFromBucket(String, String, String)}
  *
- * <p> Get data:
+ * <p><b>Get data:</b>
  * {@link Minio#getBucketsList()},
  * {@link Minio#getObjectsCountInBucket(String)},
  * {@link Minio#getObjectSize(String, String)},
@@ -570,44 +574,47 @@ public class Minio implements MinioInt, MinioConfig {
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has exactly {expectedCount} objects")
     public void seeCountObjectsInBucketExactly(String bucketName, int expectedCount) {
 
-        getObjectsCountInBucket(bucketName);
-
-        await().with()
-                .atMost(ofMillis(awaitMs)).untilAsserted(() ->
-                        assertAll(() -> assertEquals(
-                                expectedCount,
-                                getObjectsListNoReport(bucketName).size(),
-                                MessageFormat.format("Count objects from bucket <{0}> expected to be exactly <{1}> but got <{2}>",
-                                        bucketName, expectedCount, getObjectsListNoReport(bucketName).size()))));
+        try {
+            await().with()
+                    .atMost(ofMillis(awaitMs)).untilAsserted(() ->
+                            assertIntEquals(expectedCount, getObjectsListNoReport(bucketName).size()));
+        }catch (ConditionTimeoutException e){
+            throw new AssertionWithAwaitFailedError(
+                    MessageFormat.format(
+                            "Count objects from bucket <{0}> expected to be EXACTLY <{1}> but got <{2}> within {3}",
+                            bucketName, expectedCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
+        }
 
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has great then {expectedCount} objects")
     public void seeCountObjectsInBucketGreater(String bucketName, int expectedCount) {
 
-        getObjectsCountInBucket(bucketName);
-
-        await().with()
-                .atMost(ofMillis(awaitMs)).untilAsserted(() ->
-                        assertAll(() -> Assertions.assertTrue(
-                                getObjectsListNoReport(bucketName).size() > expectedCount,
-                                MessageFormat.format("Count objects from bucket <{0}> expected to be greater <{1}> but got <{2}>",
-                                        bucketName, expectedCount, getObjectsListNoReport(bucketName).size())))
-                );
+        try {
+            await().with()
+                    .atMost(ofMillis(awaitMs)).untilAsserted(() ->
+                            assertGreaterThanExpected(expectedCount, getObjectsListNoReport(bucketName).size()));
+        }catch (ConditionTimeoutException e){
+            throw new AssertionWithAwaitFailedError(
+                    MessageFormat.format(
+                            "Count objects from bucket <{0}> expected to be GREATER than <{1}> but got <{2}> within {3}",
+                            bucketName, expectedCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
+        }
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less then {expectedCount} objects")
     public void seeCountObjectsInBucketLess(String bucketName, int expectedCount) {
 
-        getObjectsCountInBucket(bucketName);
-
-        await().with()
-                .atMost(ofMillis(awaitMs)).untilAsserted(() ->
-                        assertAll(() -> Assertions.assertTrue(
-                                getObjectsListNoReport(bucketName).size() < expectedCount,
-                                MessageFormat.format("Count objects from bucket <{0}> expected to be less <{1}> but got <{2}>",
-                                        bucketName, expectedCount, getObjectsListNoReport(bucketName).size())))
-                );
+        try {
+            await().with()
+                    .atMost(ofMillis(awaitMs)).untilAsserted(() ->
+                            assertLessThanExpected(expectedCount, getObjectsListNoReport(bucketName).size()));
+        }catch (ConditionTimeoutException e){
+            throw new AssertionWithAwaitFailedError(
+                    MessageFormat.format(
+                            "Count objects from bucket <{0}> expected to be LESS than <{1}> but got <{2}> within {3}",
+                            bucketName, expectedCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
+        }
 
     }
 

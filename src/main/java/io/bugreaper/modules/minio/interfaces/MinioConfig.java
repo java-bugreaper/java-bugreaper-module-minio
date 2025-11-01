@@ -12,7 +12,7 @@ public interface MinioConfig {
 
 
     /**
-     * Configure
+     * Configure download buffer size
      *
      * @param downloadBufferSize buffer size for file upload
      * @return this
@@ -20,15 +20,15 @@ public interface MinioConfig {
     Minio withDownloadBufferSize(int downloadBufferSize);
 
     /**
-     * Configure
+     * Configure await in asserts with await
      *
-     * @param awaitMs ms wait for object in asserts with await
+     * @param awaitMs ms await for object in asserts with await
      * @return this
      */
     Minio withAwaitMs(int awaitMs);
 
     /**
-     * Configure
+     * Configure max size for file to upload
      *
      * @param maxUploadSize max size in bytes for file to upload
      * @return this
@@ -36,7 +36,7 @@ public interface MinioConfig {
     Minio withMaxUploadSize(int maxUploadSize);
 
     /**
-     * Configure
+     * Configure max size for file to download/read
      *
      * @param maxDownloadObjectSize max size in bytes for object to download/read
      * @return this
