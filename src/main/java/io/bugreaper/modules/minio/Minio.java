@@ -120,7 +120,7 @@ public class Minio implements MinioInt, MinioConfig {
     private int maxDownloadObjectSize = 1024 * 50;
 
     /**
-     * CThis constructor initializes client for interaction with Minio
+     * This constructor initializes client for interaction with Minio
      *
      * @param host host of Minio ("http://your-minio-host")
      * @param port port of Minio

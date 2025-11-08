@@ -178,9 +178,9 @@ class MinioBaseTests {
 
 
         minio.getObjectsList(DEFAULT_BUCKET)
-                .testInLIst(elementsCountInList(2))
-                .testInLIst(stringEqualsInList("object1.txt"))
-                .testInLIst(stringContainsInList("test/object2.txt"));
+                .verifyInList(hasExactCount(2))
+                .verifyInList(stringEqual("object1.txt"))
+                .verifyInList(stringContains("test/object2.txt"));
     }
 
     @Test
