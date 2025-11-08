@@ -165,9 +165,9 @@ void test() {
     // list can be asserted by chain
     
     minio.getObjectsList(DEFAULT_BUCKET)
-        .testInLIst(elementsCountInList(2))
-        .testInLIst(stringEqualsInList("object1.txt"))
-        .testInLIst(stringContainsInList("object2"));    
+        .verifyInList(hasExactCount(2))
+        .verifyInList(stringEqual("object1.txt"))
+        .verifyInList(stringContains("test/object2.txt"));
 }
 ```
 

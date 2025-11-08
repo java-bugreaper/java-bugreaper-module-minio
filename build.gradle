@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    api 'io.gitlab.ambu550:bugreaper-core:0.0.7'
+    api 'io.gitlab.ambu550:bugreaper-core:0.0.8-rc'
 
     api 'io.minio:minio:8.5.17'
 
@@ -41,15 +41,9 @@ test {
     useJUnitPlatform()
     systemProperty('allure.results.directory', project.buildDir.toString() + "/allure-results")
 
-    systemProperties(System.getProperties())
-
     testLogging {
         events("PASSED", "FAILED", "SKIPPED")
-        showStandardStreams = true
-        exceptionFormat = "full"
     }
-
-    test.outputs.upToDateWhen { false }
     finalizedBy jacocoTestReport
 }
 
