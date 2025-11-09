@@ -58,7 +58,7 @@ class MinioBaseTests {
         minio.seeObjectExists(DEFAULT_BUCKET, obj);
 
         minio.deleteObjectFromBucket(DEFAULT_BUCKET, obj);
-        minio.seeObjectNotExists(DEFAULT_BUCKET, obj);
+        minio.seeObjectDoesNotExist(DEFAULT_BUCKET, obj);
     }
 
     @Test
@@ -134,7 +134,7 @@ class MinioBaseTests {
         var actual = minio.objectExistsStatus(DEFAULT_BUCKET, "not_exist.txt");
         var expected = false;
 
-        minio.seeObjectNotExists(DEFAULT_BUCKET, "not_exist.txt");
+        minio.seeObjectDoesNotExist(DEFAULT_BUCKET, "not_exist.txt");
 
         assertEquals(expected, actual, "Get object exists status:" + expected);
     }
@@ -165,8 +165,8 @@ class MinioBaseTests {
         minio.uploadFileToBucket(DEFAULT_BUCKET, fileName, object);
 
         minio.seeObjectSizeExactly(DEFAULT_BUCKET, object, expectedBytes);
-        minio.seeObjectSizeGreater(DEFAULT_BUCKET, object, expectedBytes - 1);
-        minio.seeObjectSizeLess(DEFAULT_BUCKET, object, expectedBytes + 1);
+        minio.seeObjectSizeIsGreaterThan(DEFAULT_BUCKET, object, expectedBytes - 1);
+        minio.seeObjectSizeIsLessThan(DEFAULT_BUCKET, object, expectedBytes + 1);
 
     }
 
@@ -198,7 +198,7 @@ class MinioBaseTests {
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "test/object2.txt");
 
-        minio.seeCountObjectsInBucketExactly(DEFAULT_BUCKET, 2);
+        minio.seeObjectsCountIsExactly(DEFAULT_BUCKET, 2);
     }
 
     @Test
@@ -232,7 +232,7 @@ class MinioBaseTests {
         String bucket = "bucket-for-delete";
         minio.createBucket(bucket);
         minio.deleteEmptyBucket(bucket);
-        minio.seeBucketNotExists(bucket);
+        minio.seeBucketDoesNotExist(bucket);
     }
 
     @Test
@@ -243,7 +243,7 @@ class MinioBaseTests {
         minio.seeBucketIsNotEmpty(bucket);
 
         minio.deleteFilledBucket(bucket);
-        minio.seeBucketNotExists(bucket);
+        minio.seeBucketDoesNotExist(bucket);
 
     }
 
@@ -255,7 +255,7 @@ class MinioBaseTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
-        minio.seeCountObjectsInBucketGreater(bucket, 1);
+        minio.seeObjectsCountIsGreaterThan(bucket, 1);
 
     }
 
@@ -268,7 +268,7 @@ class MinioBaseTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
-        minio.seeCountObjectsInBucketLess(bucket, 3);
+        minio.seeObjectsCountIsLessThan(bucket, 3);
 
     }
 
@@ -285,5 +285,19 @@ class MinioBaseTests {
 
         assertEquals(readResourceFile(TEST_FILE), content, "Shared object correct");
     }
+
+    @Test
+    void getBucketListTest() {
+
+        var bucket = "bucket-test-1";
+
+        minio.createBucket(bucket);
+
+        minio.getBucketsList()
+                .verifyInList(stringEqual(bucket))
+                .verifyInList(stringContains("bucket-test"));
+    }
+
+
 
 }

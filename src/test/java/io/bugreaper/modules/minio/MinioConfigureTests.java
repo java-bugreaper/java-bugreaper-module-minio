@@ -52,7 +52,7 @@ class MinioConfigureTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minio.seeCountObjectsInBucketExactly(bucket,3));
+                minio.seeObjectsCountIsExactly(bucket,3));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
@@ -71,7 +71,7 @@ class MinioConfigureTests {
 
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minioAwait.seeCountObjectsInBucketExactly(bucket,2));
+                minioAwait.seeObjectsCountIsExactly(bucket,2));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
@@ -90,7 +90,7 @@ class MinioConfigureTests {
 
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minioAwait.seeCountObjectsInBucketExactly(bucket,2));
+                minioAwait.seeObjectsCountIsExactly(bucket,2));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
@@ -107,7 +107,7 @@ class MinioConfigureTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
-        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> minio.seeCountObjectsInBucketExactly(bucket,3));
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> minio.seeObjectsCountIsExactly(bucket,3));
         CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> pushWithSleep(bucket));
 
         CompletableFuture.allOf(future1, future2).join();

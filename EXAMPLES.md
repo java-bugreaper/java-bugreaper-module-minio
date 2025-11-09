@@ -136,9 +136,9 @@ void test() {
     
     minio.seeBucketIsNotEmpty(DEFAULT_BUCKET);                                 
     minio.seeObjectExists(DEFAULT_BUCKET, "test_file_1.txt");                 
-    minio.seeCountObjectsInBucketExactly(DEFAULT_BUCKET, 1);                      
-    minio.seeCountObjectsInBucketGreater(DEFAULT_BUCKET, 0);                      
-    minio.seeCountObjectsInBucketLess(DEFAULT_BUCKET, 3);                      
+    minio.seeObjectsCountIsExactly(DEFAULT_BUCKET, 1);                      
+    minio.seeObjectsCountIsGreaterThan(DEFAULT_BUCKET, 0);                      
+    minio.seeObjectsCountIsLessThan(DEFAULT_BUCKET, 3);                      
 
 }
 ```
