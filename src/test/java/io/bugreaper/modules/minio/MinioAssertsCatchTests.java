@@ -30,19 +30,19 @@ class MinioAssertsCatchTests {
                 minio.seeBucketExists(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> not exists", bucket),
+                String.format("Bucket <%s> does not exist", bucket),
                 exception.getMessage(),
                 "Error on check bucket exists fail");
     }
 
     @Test
-    void seeBucketNotExistsFailedTest() {
+    void seeBucketDoesNotExistFailedTest() {
         var bucket = "exists-bucket";
 
         minio.createBucket(bucket);
 
         Throwable exception = assertThrows(AssertionFailedError.class, () ->
-                minio.seeBucketNotExists(bucket));
+                minio.seeBucketDoesNotExist(bucket));
 
         assertEquals(
                 String.format("Bucket <%s> exists", bucket),
@@ -60,13 +60,13 @@ class MinioAssertsCatchTests {
                 minio.seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> not exists in bucket <%s>", object, bucket),
+                String.format("Object <%s> does not exist in bucket <%s>", object, bucket),
                 exception.getMessage(),
                 "Error on check object exists fail");
     }
 
     @Test
-    void seeObjectNotExistsFailedTest() {
+    void seeObjectDoesNotExistFailedTest() {
         var bucket = "for-object";
         var object = "object_test_y";
 
@@ -75,7 +75,7 @@ class MinioAssertsCatchTests {
 
 
         Throwable exception = assertThrows(AssertionFailedError.class, () ->
-                minio.seeObjectNotExists(bucket, object));
+                minio.seeObjectDoesNotExist(bucket, object));
 
         assertEquals(
                 String.format("Object <%s> exists in bucket <%s>", object, bucket),
@@ -93,7 +93,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minio.seeCountObjectsInBucketExactly(bucket,3));
+                minio.seeObjectsCountIsExactly(bucket,3));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
@@ -110,7 +110,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minio.seeCountObjectsInBucketLess(bucket, 1));
+                minio.seeObjectsCountIsLessThan(bucket, 1));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count greater in bucket",
@@ -127,7 +127,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minio.seeCountObjectsInBucketGreater(bucket, 2));
+                minio.seeObjectsCountIsGreaterThan(bucket, 2));
 
         MatcherAssert.assertThat(
                 "Error on assert objects count greater in bucket",
@@ -156,7 +156,7 @@ class MinioAssertsCatchTests {
                 StringContains.containsString("Object <object_size.txt> size from bucket <bucket-test> expected to be equal <179> bytes but got <180>"));
 
         Throwable exceptionLess = assertThrows(AssertionFailedError.class, () ->
-                minio.seeObjectSizeLess(TEST_BUCKET, object, expectedBytes ));
+                minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, expectedBytes ));
 
         MatcherAssert.assertThat(
                 "Error on assert objects size",
@@ -164,7 +164,7 @@ class MinioAssertsCatchTests {
                 StringContains.containsString("Object <object_size.txt> size from bucket <bucket-test> expected to be less <180> bytes but got <180>"));
 
         Throwable exceptionGreater = assertThrows(AssertionFailedError.class, () ->
-                minio.seeObjectSizeGreater(TEST_BUCKET, object, expectedBytes ));
+                minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, expectedBytes ));
 
         MatcherAssert.assertThat(
                 "Error on assert objects size",

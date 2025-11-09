@@ -42,7 +42,7 @@ class MinioExceptionsTests {
                 minio.objectExistsStatus(bucketName, "object.txt"));
 
         assertEquals(
-                MessageFormat.format("Bucket <{0}> not exists", bucketName),
+                MessageFormat.format("Bucket <{0}> does not exist", bucketName),
                 exception.getMessage(),
                 "Error on check object in tot existing bucket");
     }
@@ -97,7 +97,7 @@ class MinioExceptionsTests {
                 minio.deleteEmptyBucket(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> not exists", bucket),
+                String.format("Bucket <%s> does not exist", bucket),
                 exception.getMessage(),
                 "Error on try delete not empty bucket");
     }

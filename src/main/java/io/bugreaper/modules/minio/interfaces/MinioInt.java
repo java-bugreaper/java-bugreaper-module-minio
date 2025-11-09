@@ -22,7 +22,7 @@ public interface MinioInt {
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeCountObjectsInBucketExactly(String bucketName, int expectedCount);
+    void seeObjectsCountIsExactly(String bucketName, int expectedCount);
 
     /**
      * Assert number of objects in bucket greater than expected (with await)
@@ -32,7 +32,7 @@ public interface MinioInt {
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeCountObjectsInBucketGreater(String bucketName, int expectedCount);
+    void seeObjectsCountIsGreaterThan(String bucketName, int expectedCount);
 
     /**
      * Assert number of objects in bucket less than expected (with await)
@@ -42,7 +42,7 @@ public interface MinioInt {
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeCountObjectsInBucketLess(String bucketName, int expectedCount);
+    void seeObjectsCountIsLessThan(String bucketName, int expectedCount);
 
     /**
      * Delete all objects in bucket
@@ -186,16 +186,16 @@ public interface MinioInt {
     void seeBucketIsNotEmpty(String bucketName);
 
     /**
-     * Assert that bucket not exists
+     * Assert that bucket does not exist
      *
      * @param bucketName bucket name
      * @throws AssertionError       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
-    void seeBucketNotExists(String bucketName);
+    void seeBucketDoesNotExist(String bucketName);
 
     /**
-     * Assert that object exists
+     * Assert that object exist
      *
      * @param bucketName bucket name
      * @param objectName object path/name
@@ -205,18 +205,18 @@ public interface MinioInt {
     void seeObjectExists(String bucketName, String objectName);
 
     /**
-     * Assert that object not exists
+     * Assert that object does not exist
      *
      * @param bucketName bucket name
      * @param objectName object path/name
      * @throws AssertionError       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
-    void seeObjectNotExists(String bucketName, String objectName);
+    void seeObjectDoesNotExist(String bucketName, String objectName);
 
 
     /**
-     * Assert size of objects in bucket exactly as expected
+     * Assert size of object in bucket exactly as expected
      *
      * @param bucketName    bucket name
      * @param objectName    object path/name
@@ -227,7 +227,7 @@ public interface MinioInt {
     void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize);
 
     /**
-     * Assert size of objects in bucket greater than expected
+     * Assert size of object in bucket greater than expected
      *
      * @param bucketName    bucket name
      * @param objectName    object path/name
@@ -235,7 +235,7 @@ public interface MinioInt {
      * @throws AssertionFailedError on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeObjectSizeGreater(String bucketName, String objectName, long expectedSize);
+    void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long expectedSize);
 
     /**
      * Assert size of objects in bucket less than expected
@@ -246,7 +246,7 @@ public interface MinioInt {
      * @throws AssertionFailedError on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeObjectSizeLess(String bucketName, String objectName, long expectedSize);
+    void seeObjectSizeIsLessThan(String bucketName, String objectName, long expectedSize);
 
     /**
      * Share object and return url

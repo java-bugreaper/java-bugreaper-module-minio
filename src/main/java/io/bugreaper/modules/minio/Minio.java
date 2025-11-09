@@ -54,15 +54,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link Minio#seeBucketExists(String)},
  * {@link Minio#seeBucketIsEmpty(String)},
  * {@link Minio#seeBucketIsNotEmpty(String)},
- * {@link Minio#seeBucketNotExists(String)},
+ * {@link Minio#seeBucketDoesNotExist(String)},
  * {@link Minio#seeObjectExists(String, String)},
- * {@link Minio#seeObjectNotExists(String, String)},
+ * {@link Minio#seeObjectDoesNotExist(String, String)},
  * {@link Minio#seeObjectSizeExactly(String, String, long)},
- * {@link Minio#seeObjectSizeGreater(String, String, long)},
- * {@link Minio#seeObjectSizeLess(String, String, long)},
- * {@link Minio#seeCountObjectsInBucketExactly(String, int)},
- * {@link Minio#seeCountObjectsInBucketGreater(String, int)},
- * {@link Minio#seeCountObjectsInBucketLess(String, int)}
+ * {@link Minio#seeObjectSizeIsGreaterThan(String, String, long)},
+ * {@link Minio#seeObjectSizeIsLessThan(String, String, long)},
+ * {@link Minio#seeObjectsCountIsExactly(String, int)},
+ * {@link Minio#seeObjectsCountIsGreaterThan(String, int)},
+ * {@link Minio#seeObjectsCountIsLessThan(String, int)}
  *
  * <p><b>Asserts:</b>
  * {@link Minio#uploadFileToBucket(String, String)}
@@ -330,7 +330,7 @@ public class Minio implements MinioInt, MinioConfig {
             logger.info("Bucket <{}> successfully created", bucketName);
         } catch (ErrorResponseException e) {
             if (e.errorResponse().message().contains("already own it")) {
-                logger.info("Bucket <{}> already exists", bucketName);
+                logger.info("Bucket <{}> already exist", bucketName);
             } else {
                 throw new MinioHelperException("Error occurred: " + e.getMessage());
             }
@@ -352,7 +352,7 @@ public class Minio implements MinioInt, MinioConfig {
                 throw new MinioHelperException(String.format("Bucket <%s> not empty", bucketName), e);
 
             } else if ("The specified bucket does not exist".equals(e.errorResponse().message())) {
-                throw new MinioHelperException(String.format("Bucket <%s> not exists", bucketName), e);
+                throw new MinioHelperException(String.format("Bucket <%s> does not exist", bucketName), e);
 
             } else {
                 throw new MinioHelperException(String.format("Error occurred while delete bucket <%s>", bucketName), e);
@@ -421,7 +421,7 @@ public class Minio implements MinioInt, MinioConfig {
                 return false;
 
             } else if ("The specified bucket does not exist".equals(e.errorResponse().message())) {
-                throw new MinioHelperException("Bucket <" + bucketName + "> not exists", e);
+                throw new MinioHelperException("Bucket <" + bucketName + "> does not exist", e);
 
             } else {
                 throw new MinioHelperException("Error occurred while checking object existence", e);
@@ -540,13 +540,13 @@ public class Minio implements MinioInt, MinioConfig {
     public void seeBucketExists(String bucketName) {
 
         if (!bucketExistingStatus(bucketName)) {
-            fail(String.format("Bucket <%s> not exists", bucketName));
+            fail(String.format("Bucket <%s> does not exist", bucketName));
         }
 
     }
 
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> not exists")
-    public void seeBucketNotExists(String bucketName) {
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> does not exist")
+    public void seeBucketDoesNotExist(String bucketName) {
 
         if (bucketExistingStatus(bucketName)) {
             fail(String.format("Bucket <%s> exists", bucketName));
@@ -557,13 +557,13 @@ public class Minio implements MinioInt, MinioConfig {
     public void seeObjectExists(String bucketName, String objectName) {
 
         if (!objectExistsStatus(bucketName, objectName)) {
-            fail(String.format("Object <%s> not exists in bucket <%s>", objectName, bucketName));
+            fail(String.format("Object <%s> does not exist in bucket <%s>", objectName, bucketName));
         }
 
     }
 
-    @Step("(Minio)[ASSERT] Object: <{objectName}> not exists in bucket <{bucketName}>")
-    public void seeObjectNotExists(String bucketName, String objectName) {
+    @Step("(Minio)[ASSERT] Object: <{objectName}> does not exist in bucket <{bucketName}>")
+    public void seeObjectDoesNotExist(String bucketName, String objectName) {
 
         if (objectExistsStatus(bucketName, objectName)) {
             fail(String.format("Object <%s> exists in bucket <%s>", objectName, bucketName));
@@ -572,7 +572,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has exactly {expectedCount} objects")
-    public void seeCountObjectsInBucketExactly(String bucketName, int expectedCount) {
+    public void seeObjectsCountIsExactly(String bucketName, int expectedCount) {
 
         try {
             await().with()
@@ -588,7 +588,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has great then {expectedCount} objects")
-    public void seeCountObjectsInBucketGreater(String bucketName, int expectedCount) {
+    public void seeObjectsCountIsGreaterThan(String bucketName, int expectedCount) {
 
         try {
             await().with()
@@ -603,7 +603,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less then {expectedCount} objects")
-    public void seeCountObjectsInBucketLess(String bucketName, int expectedCount) {
+    public void seeObjectsCountIsLessThan(String bucketName, int expectedCount) {
 
         try {
             await().with()
@@ -629,7 +629,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {expectedSize}")
-    public void seeObjectSizeGreater(String bucketName, String objectName, long expectedSize) {
+    public void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long expectedSize) {
         Assertions.assertTrue(
                 getObjectSize(bucketName, objectName) > expectedSize,
                 MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> bytes but got <{3}>",
@@ -637,7 +637,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {expectedSize}")
-    public void seeObjectSizeLess(String bucketName, String objectName, long expectedSize) {
+    public void seeObjectSizeIsLessThan(String bucketName, String objectName, long expectedSize) {
         Assertions.assertTrue(
                 getObjectSize(bucketName, objectName) < expectedSize,
                 MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> bytes but got <{3}>",
