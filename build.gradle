@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    api 'io.gitlab.ambu550:bugreaper-core:0.0.8-rc'
+    api 'io.gitlab.ambu550:bugreaper-core:0.0.8'
 
     api 'io.minio:minio:8.5.17'
 
@@ -43,6 +43,7 @@ test {
 
     testLogging {
         events("PASSED", "FAILED", "SKIPPED")
+        exceptionFormat = "full"
     }
     finalizedBy jacocoTestReport
 }

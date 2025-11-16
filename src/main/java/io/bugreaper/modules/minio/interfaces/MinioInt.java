@@ -1,7 +1,6 @@
 package io.bugreaper.modules.minio.interfaces;
 
 import io.bugreaper.core.assertable.AssertableStringList;
-import io.bugreaper.core.assertable.stringlist.ListOperators;
 import io.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.awaitility.core.ConditionTimeoutException;
 import org.opentest4j.AssertionFailedError;
@@ -99,7 +98,7 @@ public interface MinioInt {
     /**
      * Return list of buckets
      *
-     * @return {@link AssertableStringList} (use with {@link ListOperators})
+     * @return {@link AssertableStringList}
      * <p> EXAMPLE:
      * <p>getBucketsList("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>
@@ -130,7 +129,7 @@ public interface MinioInt {
      * Return list of objects(with path) from bucket
      *
      * @param bucketName bucket name
-     * @return {@link AssertableStringList} (use with {@link ListOperators})
+     * @return {@link AssertableStringList}
      * <p> EXAMPLE:
      * <p>getObjectsList("my-bucket").testInLIst(stringEqualsInList("my_object"))
      * <p><b>can be provided multiple asserts with list</b>

@@ -16,6 +16,7 @@ public interface MinioConfig {
      *
      * @param downloadBufferSize buffer size for file upload
      * @return this instance {@link Minio}
+     * @throws IllegalArgumentException on invalid setup
      */
     Minio withDownloadBufferSize(int downloadBufferSize);
 
@@ -24,6 +25,7 @@ public interface MinioConfig {
      *
      * @param awaitMs ms await
      * @return this instance {@link Minio}
+     * @throws IllegalArgumentException on invalid setup
      */
     Minio withAwaitMs(int awaitMs);
 
@@ -32,6 +34,7 @@ public interface MinioConfig {
      *
      * @param maxUploadSize max size in bytes for file to upload
      * @return this instance {@link Minio}
+     * @throws IllegalArgumentException on invalid setup
      */
     Minio withMaxUploadSize(int maxUploadSize);
 
@@ -40,6 +43,7 @@ public interface MinioConfig {
      *
      * @param maxDownloadObjectSize max size in bytes for object to download/read
      * @return this instance {@link Minio}
+     * @throws IllegalArgumentException on invalid setup
      */
     Minio withMaxDownloadObjectSize(int maxDownloadObjectSize);
 
