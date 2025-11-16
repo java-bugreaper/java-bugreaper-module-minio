@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import testcontainers.MinioSetup;
 
 import static helper.ApiExtractor.extractBody;
-import static io.bugreaper.core.assertable.stringlist.ListOperators.*;
+
 import static io.bugreaper.core.filereaders.ResourcesFileReader.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -178,9 +178,9 @@ class MinioBaseTests {
 
 
         minio.getObjectsList(DEFAULT_BUCKET)
-                .verifyInList(hasExactCount(2))
-                .verifyInList(stringEqual("object1.txt"))
-                .verifyInList(stringContains("test/object2.txt"));
+                .seeListHasExactlyCount(2)
+                .seeListAnyEquals("object1.txt")
+                .seeListAnyContains("test/object2.txt");
     }
 
     @Test
@@ -294,8 +294,8 @@ class MinioBaseTests {
         minio.createBucket(bucket);
 
         minio.getBucketsList()
-                .verifyInList(stringEqual(bucket))
-                .verifyInList(stringContains("bucket-test"));
+                .seeListAnyEquals(bucket)
+                .seeListAnyContains("bucket-test");
     }
 
 

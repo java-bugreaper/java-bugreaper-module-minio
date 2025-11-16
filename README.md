@@ -1,10 +1,11 @@
 # BUGREAPER: module-minio
 
-for interact with the MINIO
+for interaction with MINIO
 
 ## [apiDOC](https://bug-reaper.gitlab.io/java-bugreaper-module-minio/)
+## [Wiki](https://gitlab.com/bug-reaper/java-bugreaper-module-minio/-/wikis/home)
 
-### [EXAMPLES.md](EXAMPLES.md)
+### [EXAMPLES](https://gitlab.com/bug-reaper/java-bugreaper-module-minio/-/wikis/Examples)
 
 ### Requirements:
 
@@ -22,10 +23,3 @@ for interact with the MINIO
 ## Real examples here:
 - ### [Report-minio](https://bug-reaper.gitlab.io/java-bugreaper-sandbox/#behaviors)
 - ### [Tests](https://gitlab.com/bug-reaper/java-bugreaper-sandbox/-/tree/main/java-test-part1)
-
-### Dependencies
-| Lib                                                                                   | Version  | Description       |
-|---------------------------------------------------------------------------------------|----------|-------------------|
-| [bugreaper-core](https://mvnrepository.com/artifact/io.gitlab.ambu550/bugreaper-core) | 0.0.8-rc | bugreaper CORE    |
-| [Minio Client](https://mvnrepository.com/artifact/io.minio/minio)                     | 8.5.17   | Minio Java client |
-
