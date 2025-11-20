@@ -21,13 +21,13 @@ java {
 
 repositories {
 
-    //mavenLocal()
     mavenCentral()
+    //mavenLocal()
 
 }
 
 dependencies {
-    api 'io.gitlab.ambu550:bugreaper-core:0.0.8'
+    api 'io.gitlab.ambu550:bugreaper-core:0.0.9'
 
     api 'io.minio:minio:8.5.17'
 
@@ -57,6 +57,11 @@ jacocoTestReport {
         html.required = true
         csv.required = false
     }
+}
+
+// Compile main code with -parameters so reflection sees real parameter names
+tasks.named('compileJava') {
+    options.compilerArgs += ['-parameters']
 }
 
 sonar {
