@@ -24,24 +24,24 @@ public interface MinioInt {
     void seeObjectsCountIsExactly(String bucketName, int expectedCount);
 
     /**
-     * Assert number of objects in bucket greater than expected (with await)
+     * Assert number of objects in bucket greater than minSize (with await)
      *
      * @param bucketName    bucket name
-     * @param expectedCount expected count
+     * @param minCount minimum count
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeObjectsCountIsGreaterThan(String bucketName, int expectedCount);
+    void seeObjectsCountIsGreaterThan(String bucketName, int minCount);
 
     /**
-     * Assert number of objects in bucket less than expected (with await)
+     * Assert number of objects in bucket less than maxCount (with await)
      *
      * @param bucketName    bucket name
-     * @param expectedCount expected count
+     * @param maxCount expected count
      * @throws ConditionTimeoutException on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeObjectsCountIsLessThan(String bucketName, int expectedCount);
+    void seeObjectsCountIsLessThan(String bucketName, int maxCount);
 
     /**
      * Delete all objects in bucket
@@ -53,7 +53,7 @@ public interface MinioInt {
 
     /**
      * Create bucket
-     * <p> no error if bucket already exists (is ignored, the objects remain)
+     * <p> No error if bucket already exists (is ignored, the objects remain)
      *
      * @param bucketName bucket name
      * @throws MinioHelperException if failed to create
@@ -95,12 +95,13 @@ public interface MinioInt {
      * @throws MinioHelperException on Minio errors
      */
     void downloadObjectFromBucket(String bucketName, String objectName, String filePathName);
+
     /**
      * Return list of buckets
      *
      * @return {@link AssertableStringList}
      * <p> EXAMPLE:
-     * <p>getBucketsList("my-bucket").testInLIst(stringEqualsInList("my_object"))
+     * <p>getBucketsList().seeListAnyEquals("bucket.txt")
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
@@ -131,7 +132,7 @@ public interface MinioInt {
      * @param bucketName bucket name
      * @return {@link AssertableStringList}
      * <p> EXAMPLE:
-     * <p>getObjectsList("my-bucket").testInLIst(stringEqualsInList("my_object"))
+     * <p>getObjectsList("my-bucket").seeListAnyEquals("object1.txt"))
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */
@@ -213,7 +214,6 @@ public interface MinioInt {
      */
     void seeObjectDoesNotExist(String bucketName, String objectName);
 
-
     /**
      * Assert size of object in bucket exactly as expected
      *
@@ -226,26 +226,26 @@ public interface MinioInt {
     void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize);
 
     /**
-     * Assert size of object in bucket greater than expected
+     * Assert size of object in bucket greater than minSize
      *
      * @param bucketName    bucket name
      * @param objectName    object path/name
-     * @param expectedSize expected size in bytes
+     * @param minSize minimum size in bytes
      * @throws AssertionFailedError on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long expectedSize);
+    void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long minSize);
 
     /**
-     * Assert size of objects in bucket less than expected
+     * Assert size of objects in bucket less than maxSize
      *
      * @param bucketName    bucket name
      * @param objectName    object path/name
-     * @param expectedSize expected size in bytes
+     * @param maxSize maximum size in bytes
      * @throws AssertionFailedError on assert fail
      * @throws MinioHelperException    on other Minio errors
      */
-    void seeObjectSizeIsLessThan(String bucketName, String objectName, long expectedSize);
+    void seeObjectSizeIsLessThan(String bucketName, String objectName, long maxSize);
 
     /**
      * Share object and return url
@@ -258,7 +258,7 @@ public interface MinioInt {
     String shareObjectInBucket(String bucketName, String objectName);
 
     /**
-     * Upload object to bucket with same name
+     * Upload object to bucket with same name as file
      *
      * @param bucketName bucket name
      * @param filePath path to file in test resources
@@ -267,7 +267,7 @@ public interface MinioInt {
     void uploadFileToBucket(String bucketName, String filePath);
 
     /**
-     * Upload object to bucket
+     * Upload object to bucket with custom name
      *
      * @param bucketName bucket name
      * @param filePath path to file in test resources
@@ -277,7 +277,7 @@ public interface MinioInt {
     void uploadFileToBucket(String bucketName, String filePath, String objectName);
 
     /**
-     * Upload object to bucket
+     * Upload object to bucket with custom name and type
      *
      * @param bucketName bucket name
      * @param filePath path to file in test resources

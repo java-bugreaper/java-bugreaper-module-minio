@@ -7,7 +7,6 @@ import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
-import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import io.bugreaper.modules.minio.exceptions.MinioHelperException;
 import io.bugreaper.modules.minio.interfaces.MinioConfig;
@@ -26,11 +25,12 @@ import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static io.bugreaper.core.allurereporter.AllureReporter.attachJson;
 import static io.bugreaper.core.assertions.Asserts.*;
+import static io.bugreaper.core.filereaders.pathfinder.ProjectPaths.getTestResourcesPath;
 import static io.bugreaper.core.mappers.StringMappers.formatMilliseconds;
 import static java.time.Duration.ofMillis;
 import static io.bugreaper.core.allurereporter.AllureReporter.attachFromList;
@@ -81,9 +81,9 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link Minio#readObjectFromBucket(String, String)},
  *
  * <p> Await for some counts assert default: {@link Minio#awaitMs}, can be changed by: {@link Minio#withAwaitMs(int)}
- * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#withDownloadBufferSize(int)})
- * <p> Max read/download object size default: {@link Minio#maxDownloadObjectSize}, can be changed by: {@link Minio#withMaxDownloadObjectSize(int)})
- * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed can be changed by: {@link Minio#withMaxUploadSize(int)})
+ * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#withDownloadBufferSize(int)}
+ * <p> Max read/download object size default: {@link Minio#maxDownloadObjectSize}, can be changed by: {@link Minio#withMaxDownloadObjectSize(int)}
+ * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed can be changed by: {@link Minio#withMaxUploadSize(int)}
  *
  * @author Oleksii Betin "ambu550"
  * @since 1.0.0
@@ -92,12 +92,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class Minio implements MinioInt, MinioConfig {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
-    private static final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
     private final MinioClient minioCl;
 
 
-    private final String resPath = getResourcesPath();
+    private final String resPath = getTestResourcesPath();
 
     /**
      * default ms await in tests
@@ -172,19 +171,6 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
 
-    /**
-     * get resource path & cut build/target part (to get rel path to resources if there is project in project)
-     * <P> WARNING! if in tests there are custom build dir it`s not work
-     */
-    private String getResourcesPath() {
-        String classResourcesPath = String.valueOf(Path.of(Objects.requireNonNull(classLoader.getResource("")).getPath()));
-        classResourcesPath = classResourcesPath.replaceAll("/build/.*", "");
-        classResourcesPath = classResourcesPath.replaceAll("/target/.*", "");
-        classResourcesPath = classResourcesPath + "/src/test/resources/";
-        return classResourcesPath;
-    }
-
-
     // Upload
 
     @Step("(Minio) Upload file: {filePathName} to bucket:<{bucketName}>")
@@ -230,7 +216,7 @@ public class Minio implements MinioInt, MinioConfig {
         }
     }
 
-    @Step("(Minio) Share object: <{objectName}> from bucket: <{bucketName}> to file: <{filePathName}>")
+    @Step("(Minio) Share object: <{objectName}> from bucket: <{bucketName}>")
     public String shareObjectInBucket(String bucketName, String objectName) {
         try {
 
@@ -242,7 +228,7 @@ public class Minio implements MinioInt, MinioConfig {
                         .expiry(7, TimeUnit.DAYS)
                         .build());
 
-            Allure.addAttachment(objectName + " shared link:", "application/json", link);
+            attachJson(objectName + " shared link:", link);
 
             return link;
 
@@ -288,7 +274,7 @@ public class Minio implements MinioInt, MinioConfig {
         checkDownloadSize(bucketName, objectName);
         String content = readObjectFromBucketMethod(bucketName, objectName);
 
-        Allure.addAttachment(objectName + " content:", "application/json", content);
+        attachJson(objectName + " content:", content);
 
         return content;
     }
@@ -536,6 +522,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
+    @Override
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> exists")
     public void seeBucketExists(String bucketName) {
 
@@ -545,6 +532,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
+    @Override
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> does not exist")
     public void seeBucketDoesNotExist(String bucketName) {
 
@@ -553,6 +541,8 @@ public class Minio implements MinioInt, MinioConfig {
         }
 
     }
+
+    @Override
     @Step("(Minio)[ASSERT] Object: <{objectName}> exists in bucket <{bucketName}>")
     public void seeObjectExists(String bucketName, String objectName) {
 
@@ -562,6 +552,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
+    @Override
     @Step("(Minio)[ASSERT] Object: <{objectName}> does not exist in bucket <{bucketName}>")
     public void seeObjectDoesNotExist(String bucketName, String objectName) {
 
@@ -571,6 +562,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
+    @Override
     @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has exactly {expectedCount} objects")
     public void seeObjectsCountIsExactly(String bucketName, int expectedCount) {
 
@@ -587,38 +579,41 @@ public class Minio implements MinioInt, MinioConfig {
 
     }
 
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has great then {expectedCount} objects")
-    public void seeObjectsCountIsGreaterThan(String bucketName, int expectedCount) {
+    @Override
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has great then {minCount} objects")
+    public void seeObjectsCountIsGreaterThan(String bucketName, int minCount) {
 
         try {
             await().with()
                     .atMost(ofMillis(awaitMs)).untilAsserted(() ->
-                            assertGreaterThanExpected(expectedCount, getObjectsListNoReport(bucketName).size()));
+                            assertGreaterThanExpected(minCount, getObjectsListNoReport(bucketName).size()));
         }catch (ConditionTimeoutException e){
             throw new AssertionWithAwaitFailedError(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be GREATER than <{1}> but got <{2}> within {3}",
-                            bucketName, expectedCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
+                            bucketName, minCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
         }
     }
 
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less then {expectedCount} objects")
-    public void seeObjectsCountIsLessThan(String bucketName, int expectedCount) {
+    @Override
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less then {maxCount} objects")
+    public void seeObjectsCountIsLessThan(String bucketName, int maxCount) {
 
         try {
             await().with()
                     .atMost(ofMillis(awaitMs)).untilAsserted(() ->
-                            assertLessThanExpected(expectedCount, getObjectsListNoReport(bucketName).size()));
+                            assertLessThanExpected(maxCount, getObjectsListNoReport(bucketName).size()));
         }catch (ConditionTimeoutException e){
             throw new AssertionWithAwaitFailedError(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be LESS than <{1}> but got <{2}> within {3}",
-                            bucketName, expectedCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
+                            bucketName, maxCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
         }
 
     }
 
 
+    @Override
     @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size exactly: {expectedSize}")
     public void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize) {
         assertEquals(
@@ -628,20 +623,22 @@ public class Minio implements MinioInt, MinioConfig {
                         objectName, bucketName, expectedSize, getObjectSize(bucketName, objectName)));
     }
 
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {expectedSize}")
-    public void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long expectedSize) {
+    @Override
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {minSize}")
+    public void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long minSize) {
         Assertions.assertTrue(
-                getObjectSize(bucketName, objectName) > expectedSize,
+                getObjectSize(bucketName, objectName) > minSize,
                 MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> bytes but got <{3}>",
-                        objectName, bucketName, expectedSize, getObjectSize(bucketName, objectName)));
+                        objectName, bucketName, minSize, getObjectSize(bucketName, objectName)));
     }
 
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {expectedSize}")
-    public void seeObjectSizeIsLessThan(String bucketName, String objectName, long expectedSize) {
+    @Override
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {maxSize}")
+    public void seeObjectSizeIsLessThan(String bucketName, String objectName, long maxSize) {
         Assertions.assertTrue(
-                getObjectSize(bucketName, objectName) < expectedSize,
+                getObjectSize(bucketName, objectName) < maxSize,
                 MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> bytes but got <{3}>",
-                        objectName, bucketName, expectedSize, getObjectSize(bucketName, objectName)));
+                        objectName, bucketName, maxSize, getObjectSize(bucketName, objectName)));
     }
 
     // private sub-methods
