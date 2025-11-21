@@ -132,7 +132,7 @@ public interface MinioInt {
      * @param bucketName bucket name
      * @return {@link AssertableStringList}
      * <p> EXAMPLE:
-     * <p>getObjectsList("my-bucket").seeListAnyEquals("object1.txt"))
+     * <p>getObjectsList("my-bucket").seeListAnyEquals("object1.txt")
      * <p><b>can be provided multiple asserts with list</b>
      * @throws MinioHelperException on Minio errors
      */

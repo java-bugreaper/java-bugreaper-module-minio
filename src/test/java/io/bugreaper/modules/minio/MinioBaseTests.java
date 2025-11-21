@@ -298,6 +298,4 @@ class MinioBaseTests {
                 .seeListAnyContains("bucket-test");
     }
 
-
-
 }

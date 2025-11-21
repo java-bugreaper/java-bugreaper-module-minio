@@ -1,0 +1,7 @@
+modules:
+  minio:
+    host: http://minio
+    port: 9000
+    username: admin
+    password: password
+    await: 300 # optional
