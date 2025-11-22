@@ -159,6 +159,15 @@ public class Minio implements MinioInt, MinioConfig {
         if (awaitVal instanceof Number number) {
             withAwaitMs(number.intValue());
         }
+        Object maxUploadFileSizeVal = YamlUtils.getValueByPath(rawData, "modules.minio.max-upload-file-size", true);
+        if (maxUploadFileSizeVal instanceof Number number) {
+            withMaxUploadSize(number.intValue());
+        }
+        Object maxDownloadObjectSizeVal = YamlUtils.getValueByPath(rawData, "modules.minio.max-download-file-size", true);
+        if (maxDownloadObjectSizeVal instanceof Number number) {
+            withMaxDownloadObjectSize(number.intValue());
+        }
+
 
     }
 
@@ -211,6 +220,20 @@ public class Minio implements MinioInt, MinioConfig {
      * @return await timeout in milliseconds
      */
     public int getAwaitMs() { return awaitMs; }
+
+
+    public String getConfigSummary() {
+        String info = String.format("""
+        %s:
+            awaitMs=%d
+            downloadBufferSize=%d
+            maxUploadFileSize=%d
+            maxDownloadObjectSize=%d%n""",
+                this.getClass().getSimpleName(), awaitMs, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
+
+        logger.info(info);
+        return info;
+    }
 
     // Upload
 
