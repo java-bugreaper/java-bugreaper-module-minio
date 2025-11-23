@@ -1,6 +1,8 @@
 package io.bugreaper.modules.minio;
 
 import io.bugreaper.core.assertable.AssertableStringList;
+import io.bugreaper.core.config.ConfigLoader;
+import io.bugreaper.core.config.YamlUtils;
 import io.bugreaper.core.exceptions.AssertionWithAwaitFailedError;
 import io.minio.*;
 import io.minio.errors.*;
@@ -25,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -83,7 +86,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p> Await for some counts assert default: {@link Minio#awaitMs}, can be changed by: {@link Minio#withAwaitMs(int)}
  * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#withDownloadBufferSize(int)}
  * <p> Max read/download object size default: {@link Minio#maxDownloadObjectSize}, can be changed by: {@link Minio#withMaxDownloadObjectSize(int)}
- * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed can be changed by: {@link Minio#withMaxUploadSize(int)}
+ * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed by: {@link Minio#withMaxUploadSize(int)}
  *
  * @author Oleksii Betin "ambu550"
  * @since 1.0.0
@@ -93,8 +96,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
 
-    private final MinioClient minioCl;
-
+    private MinioClient minioCl;
 
     private final String resPath = getTestResourcesPath();
 
@@ -130,6 +132,45 @@ public class Minio implements MinioInt, MinioConfig {
         this.minioCl = createConnect(host, port, username, password);
     }
 
+    /**
+     * Constructor with configurations
+     * <p> Loads configuration from YAML file.
+     * <p>Default: bugreaper.yml
+     * <p>Custom: -DbugreaperEnv=test loads bugreaper-test.yml
+     */
+    public Minio() {
+        loadFromYaml();
+    }
+
+    private void loadFromYaml() {
+
+        Map<String, Object> rawData = ConfigLoader.loadYaml();
+
+        //required config fields
+        String hostVal = YamlUtils.getStringValueByPath(rawData, "modules.minio.host");
+        int portVal = YamlUtils.getIntegerValueByPath(rawData, "modules.minio.port");
+        String usernameVal = YamlUtils.getStringValueByPath(rawData, "modules.minio.username");
+        String passwordVal = YamlUtils.getStringValueByPath(rawData, "modules.minio.password");
+
+        this.minioCl = createConnect(hostVal, portVal, usernameVal, passwordVal);
+
+        //optional config fields
+        Object awaitVal = YamlUtils.getValueByPath(rawData, "modules.minio.await", true);
+        if (awaitVal instanceof Number number) {
+            withAwaitMs(number.intValue());
+        }
+        Object maxUploadFileSizeVal = YamlUtils.getValueByPath(rawData, "modules.minio.max-upload-file-size", true);
+        if (maxUploadFileSizeVal instanceof Number number) {
+            withMaxUploadSize(number.intValue());
+        }
+        Object maxDownloadObjectSizeVal = YamlUtils.getValueByPath(rawData, "modules.minio.max-download-file-size", true);
+        if (maxDownloadObjectSizeVal instanceof Number number) {
+            withMaxDownloadObjectSize(number.intValue());
+        }
+
+
+    }
+
     private MinioClient createConnect(String host, int port, String username, String password) {
         return MinioClient.builder()
                 .endpoint(host + ":" + port)
@@ -137,6 +178,7 @@ public class Minio implements MinioInt, MinioConfig {
                 .build();
     }
 
+    //setters
 
     public Minio withDownloadBufferSize(int downloadBufferSize) {
         if (downloadBufferSize < 1){
@@ -170,6 +212,28 @@ public class Minio implements MinioInt, MinioConfig {
         return this;
     }
 
+    //getters
+
+    /**
+     * Returns the configured await timeout in milliseconds.
+     *
+     * @return await timeout in milliseconds
+     */
+    public int getAwaitMs() { return awaitMs; }
+
+
+    public String getConfigSummary() {
+        String info = String.format("""
+        %s:
+            awaitMs=%d
+            downloadBufferSize=%d
+            maxUploadFileSize=%d
+            maxDownloadObjectSize=%d%n""",
+                this.getClass().getSimpleName(), awaitMs, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
+
+        logger.info(info);
+        return info;
+    }
 
     // Upload
 

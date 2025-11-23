@@ -1,0 +1,9 @@
+modules:
+  minio:
+    host: http://docker
+    port: 29000
+    username: admin
+    password: password
+    await: 300 # optional
+    max-upload-file-size: 1024 # optional
+    max-download-file-size: 2048 # optional
