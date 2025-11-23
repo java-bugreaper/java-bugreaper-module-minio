@@ -47,4 +47,17 @@ public interface MinioConfig {
      */
     Minio withMaxDownloadObjectSize(int maxDownloadObjectSize);
 
+    /**
+     * Returns and logs (at INFO level) a human-readable summary of all resolved
+     * configuration values.
+     * <p>
+     * The summary includes values loaded from the YAML configuration file as well as
+     * any fields overridden programmatically after construction. Optional fields that
+     * were not present in the configuration and resolved via default values may also
+     * be included.
+     *
+     * @return String with summary
+     */
+    String getConfigSummary();
+
 }

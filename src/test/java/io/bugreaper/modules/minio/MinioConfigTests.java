@@ -20,7 +20,8 @@ class MinioConfigTests {
     private static final String TEST_FILE = "data/test_file_1.txt";
 
     private static final String CI = System.getenv("CI");
-    public static final String PROPERTY = "bugreaperEnv";
+    private static final String PROPERTY = "bugreaperEnv";
+    private String expectedHost;
 
 
     @BeforeAll
@@ -33,6 +34,15 @@ class MinioConfigTests {
         minio.cleanBucket(DEFAULT_BUCKET);
     }
 
+
+    @BeforeEach
+     void getCi(){
+        if(Objects.equals(CI, "true")){
+            this.expectedHost = "http://docker";
+        }else {
+            this.expectedHost = "http://localhost";
+        }
+    }
 
     @Test
     void testConfigWithAllFields() {
@@ -48,13 +58,17 @@ class MinioConfigTests {
 
         assertEquals(300, minioConfig.getAwaitMs());
 
-        assertEquals("""
+        assertEquals(String.format("""
                         Minio:
+                            host=%s
+                            port=29000
+                            username=admin
+                            password=password
                             awaitMs=300
                             downloadBufferSize=10240
                             maxUploadFileSize=1024
                             maxDownloadObjectSize=2048
-                        """,
+                        """, expectedHost),
                 minioConfig.getConfigSummary());
     }
 
@@ -67,13 +81,17 @@ class MinioConfigTests {
         }
 
         Minio minioConfig = new Minio();
-        assertEquals("""
+        assertEquals(String.format("""
                         Minio:
+                            host=%s
+                            port=29000
+                            username=admin
+                            password=password
                             awaitMs=2000
                             downloadBufferSize=10240
                             maxUploadFileSize=20480
                             maxDownloadObjectSize=51200
-                        """,
+                        """, expectedHost),
                 minioConfig.getConfigSummary());
     }
 

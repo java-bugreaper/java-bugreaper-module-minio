@@ -3,7 +3,6 @@ package io.bugreaper.modules.minio;
 import io.bugreaper.core.assertable.AssertableStringList;
 import io.bugreaper.core.config.ConfigLoader;
 import io.bugreaper.core.config.YamlUtils;
-import io.bugreaper.core.exceptions.AssertionWithAwaitFailedError;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
@@ -96,6 +95,11 @@ public class Minio implements MinioInt, MinioConfig {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
 
+    private String host;
+    private int port;
+    private String username;
+    private String password;
+
     private MinioClient minioCl;
 
     private final String resPath = getTestResourcesPath();
@@ -133,10 +137,30 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     /**
-     * Constructor with configurations
-     * <p> Loads configuration from YAML file.
-     * <p>Default: bugreaper.yml
-     * <p>Custom: -DbugreaperEnv=test loads bugreaper-test.yml
+     * Constructs a Minio client configuration.
+     *
+     * <p>Loads configuration values from a YAML file.</p>
+     *
+     * <p><b>Default file:</b> {@code bugreaper.yml}</p>
+     * <p><b>Custom file:</b> using {@code -DbugreaperEnv=test} loads {@code bugreaper-test.yml}</p>
+     *
+     * <p><b>Required configuration keys:</b></p>
+     * <ul>
+     *     <li>{@code modules.minio.host}</li>
+     *     <li>{@code modules.minio.port}</li>
+     *     <li>{@code modules.minio.username}</li>
+     *     <li>{@code modules.minio.password}</li>
+     * </ul>
+     *
+     * <p><b>Optional configuration keys:</b></p>
+     * <ul>
+     *     <li>{@code modules.minio.await}</li>
+     *     <li>{@code modules.minio.max-upload-file-size}</li>
+     *     <li>{@code modules.minio.max-download-file-size}</li>
+     * </ul>
+     *
+     * <p>Missing required keys will result in configuration errors.
+     * Missing optional keys will fall back to predefined defaults.</p>
      */
     public Minio() {
         loadFromYaml();
@@ -147,12 +171,12 @@ public class Minio implements MinioInt, MinioConfig {
         Map<String, Object> rawData = ConfigLoader.loadYaml();
 
         //required config fields
-        String hostVal = YamlUtils.getStringValueByPath(rawData, "modules.minio.host");
-        int portVal = YamlUtils.getIntegerValueByPath(rawData, "modules.minio.port");
-        String usernameVal = YamlUtils.getStringValueByPath(rawData, "modules.minio.username");
-        String passwordVal = YamlUtils.getStringValueByPath(rawData, "modules.minio.password");
+        this.host = YamlUtils.getStringValueByPath(rawData, "modules.minio.host");
+        this.port = YamlUtils.getIntegerValueByPath(rawData, "modules.minio.port");
+        this.username = YamlUtils.getStringValueByPath(rawData, "modules.minio.username");
+        this.password = YamlUtils.getStringValueByPath(rawData, "modules.minio.password");
 
-        this.minioCl = createConnect(hostVal, portVal, usernameVal, passwordVal);
+        this.minioCl = createConnect(host, port, username, password);
 
         //optional config fields
         Object awaitVal = YamlUtils.getValueByPath(rawData, "modules.minio.await", true);
@@ -225,11 +249,16 @@ public class Minio implements MinioInt, MinioConfig {
     public String getConfigSummary() {
         String info = String.format("""
         %s:
+            host=%s
+            port=%d
+            username=%s
+            password=%s
             awaitMs=%d
             downloadBufferSize=%d
             maxUploadFileSize=%d
             maxDownloadObjectSize=%d%n""",
-                this.getClass().getSimpleName(), awaitMs, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
+                this.getClass().getSimpleName(), host, port, username, password,
+                awaitMs, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
 
         logger.info(info);
         return info;
@@ -635,7 +664,7 @@ public class Minio implements MinioInt, MinioConfig {
                     .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                             assertIntEquals(expectedCount, getObjectsListNoReport(bucketName).size()));
         }catch (ConditionTimeoutException e){
-            throw new AssertionWithAwaitFailedError(
+            throw new ConditionTimeoutException(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be EXACTLY <{1}> but got <{2}> within {3}",
                             bucketName, expectedCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
@@ -652,7 +681,7 @@ public class Minio implements MinioInt, MinioConfig {
                     .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                             assertGreaterThanExpected(minCount, getObjectsListNoReport(bucketName).size()));
         }catch (ConditionTimeoutException e){
-            throw new AssertionWithAwaitFailedError(
+            throw new ConditionTimeoutException(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be GREATER than <{1}> but got <{2}> within {3}",
                             bucketName, minCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
@@ -668,7 +697,7 @@ public class Minio implements MinioInt, MinioConfig {
                     .atMost(ofMillis(awaitMs)).untilAsserted(() ->
                             assertLessThanExpected(maxCount, getObjectsListNoReport(bucketName).size()));
         }catch (ConditionTimeoutException e){
-            throw new AssertionWithAwaitFailedError(
+            throw new ConditionTimeoutException(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be LESS than <{1}> but got <{2}> within {3}",
                             bucketName, maxCount, getObjectsListNoReport(bucketName).size(), formatMilliseconds(awaitMs)));
