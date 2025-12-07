@@ -1,6 +1,6 @@
 modules:
   minio:
-    host: http://localhost
+    url: http://localhost
     port: 29000
     username: admin
     password: password

@@ -1,6 +1,7 @@
 package io.bugreaper.modules.minio;
 
 
+import io.bugreaper.core.config.YamlUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class MinioConfigTests {
 
     private static final String CI = System.getenv("CI");
     private static final String PROPERTY = "bugreaperEnv";
-    private String expectedHost;
+    private String expectedUrl;
 
 
     @BeforeAll
@@ -38,10 +39,11 @@ class MinioConfigTests {
     @BeforeEach
      void getCi(){
         if(Objects.equals(CI, "true")){
-            this.expectedHost = "http://docker";
+            this.expectedUrl = "http://docker";
         }else {
-            this.expectedHost = "http://localhost";
+            this.expectedUrl = "http://localhost";
         }
+        YamlUtils.clearCache();
     }
 
     @Test
@@ -60,7 +62,7 @@ class MinioConfigTests {
 
         assertEquals(String.format("""
                         Minio:
-                            host=%s
+                            url=%s
                             port=29000
                             username=admin
                             password=password
@@ -68,7 +70,7 @@ class MinioConfigTests {
                             downloadBufferSize=10240
                             maxUploadFileSize=1024
                             maxDownloadObjectSize=2048
-                        """, expectedHost),
+                        """, expectedUrl),
                 minioConfig.getConfigSummary());
     }
 
@@ -83,7 +85,7 @@ class MinioConfigTests {
         Minio minioConfig = new Minio();
         assertEquals(String.format("""
                         Minio:
-                            host=%s
+                            url=%s
                             port=29000
                             username=admin
                             password=password
@@ -91,8 +93,29 @@ class MinioConfigTests {
                             downloadBufferSize=10240
                             maxUploadFileSize=20480
                             maxDownloadObjectSize=51200
-                        """, expectedHost),
+                        """, expectedUrl),
                 minioConfig.getConfigSummary());
     }
 
+    @Test
+    void testSummaryNotConfig() {
+        if(Objects.equals(CI, "true")){
+            System.setProperty(PROPERTY, "docker");
+        }else {
+            System.clearProperty(PROPERTY);
+        }
+
+        assertEquals(String.format("""
+                        Minio:
+                            url=%s
+                            port=29000
+                            username=admin
+                            password=password
+                            awaitMs=2000
+                            downloadBufferSize=10240
+                            maxUploadFileSize=20480
+                            maxDownloadObjectSize=51200
+                        """, expectedUrl),
+                minio.getConfigSummary());
+    }
 }

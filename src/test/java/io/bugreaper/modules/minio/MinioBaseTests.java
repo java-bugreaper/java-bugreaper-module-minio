@@ -48,6 +48,8 @@ class MinioBaseTests {
     void pushFileSameNameTest() {
         minio.uploadFileToBucket(DEFAULT_BUCKET, "data/test_file_1.txt");
         minio.seeObjectExists(DEFAULT_BUCKET, "test_file_1.txt");
+
+        minio.getConfigSummary();
     }
 
     @Test
