@@ -1,7 +1,6 @@
 package io.bugreaper.modules.minio;
 
 import io.bugreaper.core.assertable.AssertableStringList;
-import io.bugreaper.core.config.ConfigLoader;
 import io.bugreaper.core.config.YamlUtils;
 import io.minio.*;
 import io.minio.errors.*;
@@ -26,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -95,7 +93,7 @@ public class Minio implements MinioInt, MinioConfig {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
 
-    private String host;
+    private String url;
     private int port;
     private String username;
     private String password;
@@ -127,13 +125,18 @@ public class Minio implements MinioInt, MinioConfig {
     /**
      * This constructor initializes client for interaction with Minio
      *
-     * @param host host of Minio ("http://your-minio-host")
+     * @param url host of Minio ("http://your-minio-host")
      * @param port port of Minio
      * @param username admin username
      * @param password  admin password
      */
-    public Minio(String host, int port, String username, String password) {
-        this.minioCl = createConnect(host, port, username, password);
+    public Minio(String url, int port, String username, String password) {
+        this.url = url;
+        this.port = port;
+        this.username = username;
+        this.password = password;
+
+        this.minioCl = createConnect(this.url, this.port, this.username, this.password);
     }
 
     /**
@@ -146,7 +149,7 @@ public class Minio implements MinioInt, MinioConfig {
      *
      * <p><b>Required configuration keys:</b></p>
      * <ul>
-     *     <li>{@code modules.minio.host}</li>
+     *     <li>{@code modules.minio.url}</li>
      *     <li>{@code modules.minio.port}</li>
      *     <li>{@code modules.minio.username}</li>
      *     <li>{@code modules.minio.password}</li>
@@ -168,36 +171,33 @@ public class Minio implements MinioInt, MinioConfig {
 
     private void loadFromYaml() {
 
-        Map<String, Object> rawData = ConfigLoader.loadYaml();
-
         //required config fields
-        this.host = YamlUtils.getStringValueByPath(rawData, "modules.minio.host");
-        this.port = YamlUtils.getIntegerValueByPath(rawData, "modules.minio.port");
-        this.username = YamlUtils.getStringValueByPath(rawData, "modules.minio.username");
-        this.password = YamlUtils.getStringValueByPath(rawData, "modules.minio.password");
+        this.url = YamlUtils.getStringValueByPath("modules.minio.url");
+        this.port = YamlUtils.getIntegerValueByPath("modules.minio.port");
+        this.username = YamlUtils.getStringValueByPath("modules.minio.username");
+        this.password = YamlUtils.getStringValueByPath("modules.minio.password");
 
-        this.minioCl = createConnect(host, port, username, password);
+        this.minioCl = createConnect(url, port, username, password);
 
         //optional config fields
-        Object awaitVal = YamlUtils.getValueByPath(rawData, "modules.minio.await", true);
+        Object awaitVal = YamlUtils.getValueByPath("modules.minio.await", true);
         if (awaitVal instanceof Number number) {
             withAwaitMs(number.intValue());
         }
-        Object maxUploadFileSizeVal = YamlUtils.getValueByPath(rawData, "modules.minio.max-upload-file-size", true);
+        Object maxUploadFileSizeVal = YamlUtils.getValueByPath("modules.minio.max-upload-file-size", true);
         if (maxUploadFileSizeVal instanceof Number number) {
             withMaxUploadSize(number.intValue());
         }
-        Object maxDownloadObjectSizeVal = YamlUtils.getValueByPath(rawData, "modules.minio.max-download-file-size", true);
+        Object maxDownloadObjectSizeVal = YamlUtils.getValueByPath("modules.minio.max-download-file-size", true);
         if (maxDownloadObjectSizeVal instanceof Number number) {
             withMaxDownloadObjectSize(number.intValue());
         }
 
-
     }
 
-    private MinioClient createConnect(String host, int port, String username, String password) {
+    private MinioClient createConnect(String url, int port, String username, String password) {
         return MinioClient.builder()
-                .endpoint(host + ":" + port)
+                .endpoint(url + ":" + port)
                 .credentials(username, password)
                 .build();
     }
@@ -249,7 +249,7 @@ public class Minio implements MinioInt, MinioConfig {
     public String getConfigSummary() {
         String info = String.format("""
         %s:
-            host=%s
+            url=%s
             port=%d
             username=%s
             password=%s
@@ -257,7 +257,7 @@ public class Minio implements MinioInt, MinioConfig {
             downloadBufferSize=%d
             maxUploadFileSize=%d
             maxDownloadObjectSize=%d%n""",
-                this.getClass().getSimpleName(), host, port, username, password,
+                this.getClass().getSimpleName(), url, port, username, password,
                 awaitMs, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
 
         logger.info(info);

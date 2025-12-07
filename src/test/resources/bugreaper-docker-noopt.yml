@@ -1,6 +1,6 @@
 modules:
   minio:
-    host: http://docker
+    url: http://docker
     port: 29000
     username: admin
     password: password
