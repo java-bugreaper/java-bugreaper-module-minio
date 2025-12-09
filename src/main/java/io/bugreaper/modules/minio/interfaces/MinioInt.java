@@ -159,57 +159,57 @@ public interface MinioInt {
     String readObjectFromBucket(String bucketName, String objectName);
 
     /**
-     * Assert that bucket exists
+     * Assert that bucket exists (with await)
      *
      * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
+     * @throws ConditionTimeoutException       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
     void seeBucketExists(String bucketName);
 
     /**
-     * Assert that bucket is empty
+     * Assert that bucket is empty (with await)
      *
      * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
+     * @throws ConditionTimeoutException       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
     void seeBucketIsEmpty(String bucketName);
 
     /**
-     * Assert that bucket is not empty
+     * Assert that bucket is not empty (with await)
      *
      * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
+     * @throws ConditionTimeoutException       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
     void seeBucketIsNotEmpty(String bucketName);
 
     /**
-     * Assert that bucket does not exist
+     * Assert that bucket does not exist (with await)
      *
      * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
+     * @throws ConditionTimeoutException       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
     void seeBucketDoesNotExist(String bucketName);
 
     /**
-     * Assert that object exist
+     * Assert that object exists (with await)
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @throws AssertionError       on assert fail
+     * @throws ConditionTimeoutException       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
     void seeObjectExists(String bucketName, String objectName);
 
     /**
-     * Assert that object does not exist
+     * Assert that object does not exist (with await)
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @throws AssertionError       on assert fail
+     * @throws ConditionTimeoutException       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
     void seeObjectDoesNotExist(String bucketName, String objectName);
