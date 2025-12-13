@@ -744,7 +744,7 @@ public class Minio implements MinioInt, MinioConfig {
 
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size exactly: {expectedSize}")
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size exactly: {expectedSize} bytes")
     public void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize) {
         assertEquals(
                 expectedSize,
@@ -754,7 +754,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {minSize}")
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {minSize} bytes")
     public void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long minSize) {
 
         try {
@@ -767,7 +767,7 @@ public class Minio implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {maxSize}")
+    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {maxSize} bytes")
     public void seeObjectSizeIsLessThan(String bucketName, String objectName, long maxSize) {
 
         try {

@@ -87,8 +87,29 @@ class MinioAssertsCatchTests {
     void seObjectExistsFailedTest() {
         var bucket = "for-object";
         var object = "object_test_n";
+
         minioFastAwait.createBucket(bucket);
         minioFastAwait.cleanBucket(bucket);
+        minioFastAwait.seeObjectDoesNotExist(bucket, object);
+
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+                minioFastAwait.seeObjectExists(bucket, object));
+
+        assertEquals(
+                String.format("Object <%s> does not exist in bucket <%s> within 300 milliseconds", object, bucket),
+                exception.getMessage(),
+                "Error on check object exists fail");
+    }
+
+    @Test
+    void seObjectExistsFailedOtherDirTest() {
+        var bucket = "for-object2";
+        var object = "object_test_n";
+
+        minioFastAwait.createBucket(bucket);
+        minioFastAwait.cleanBucket(bucket);
+        minio.uploadFileToBucket(bucket, TEST_FILE, "dir/" + object);
+
         minioFastAwait.seeObjectDoesNotExist(bucket, object);
         Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
                 minioFastAwait.seeObjectExists(bucket, object));
@@ -101,26 +122,6 @@ class MinioAssertsCatchTests {
 
     @Test
     void seObjectNotExistsFailedTest() {
-        var bucket = "for-object-exist";
-        var object = "object_test_exists";
-
-        minioFastAwait.createBucket(bucket);
-        minioFastAwait.cleanBucket(bucket);
-
-        minioFastAwait.uploadFileToBucket(bucket, TEST_FILE, object);
-        minioFastAwait.seeObjectsCountIsExactly(bucket, 1);
-
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
-                minioFastAwait.seeObjectDoesNotExist(bucket, object));
-
-        assertEquals(
-                String.format("Object <%s> exists in bucket <%s> within 300 milliseconds", object, bucket),
-                exception.getMessage(),
-                "Error on check object not exists fail");
-    }
-
-    @Test
-    void seeObjectDoesNotExistFailedTest() {
         var bucket = "for-object";
         var object = "object_test_y";
 
