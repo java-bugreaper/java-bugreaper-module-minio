@@ -1,4 +1,4 @@
-package io.bugreaper.modules.minio.exceptions;
+package net.bugreaper.modules.minio.exceptions;
 
 /**
  * Exceptions that can be thrown during Minio helper use

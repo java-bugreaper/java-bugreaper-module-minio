@@ -1,4 +1,4 @@
-package io.bugreaper.modules.minio;
+package net.bugreaper.modules.minio;
 
 
 import org.hamcrest.MatcherAssert;

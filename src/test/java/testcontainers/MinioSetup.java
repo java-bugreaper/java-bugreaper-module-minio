@@ -3,7 +3,7 @@ package testcontainers;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
-import io.bugreaper.modules.minio.Minio;
+import net.bugreaper.modules.minio.Minio;
 import org.testcontainers.containers.MinIOContainer;
 
 import java.util.Objects;

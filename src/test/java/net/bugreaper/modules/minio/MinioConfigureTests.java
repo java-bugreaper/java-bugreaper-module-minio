@@ -1,7 +1,7 @@
-package io.bugreaper.modules.minio;
+package net.bugreaper.modules.minio;
 
 
-import io.bugreaper.modules.minio.exceptions.MinioHelperException;
+import net.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
@@ -13,7 +13,7 @@ import testcontainers.MinioSetup;
 import java.util.concurrent.CompletableFuture;
 
 import static java.lang.Thread.sleep;
-import static io.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
+import static net.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 

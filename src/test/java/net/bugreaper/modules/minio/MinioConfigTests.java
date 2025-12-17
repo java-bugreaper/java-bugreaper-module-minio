@@ -1,7 +1,7 @@
-package io.bugreaper.modules.minio;
+package net.bugreaper.modules.minio;
 
 
-import io.bugreaper.core.config.YamlUtils;
+import net.bugreaper.core.config.YamlUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
