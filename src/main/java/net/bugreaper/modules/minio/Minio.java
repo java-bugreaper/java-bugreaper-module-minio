@@ -1,16 +1,16 @@
-package io.bugreaper.modules.minio;
+package net.bugreaper.modules.minio;
 
-import io.bugreaper.core.assertable.AssertableStringList;
-import io.bugreaper.core.config.YamlUtils;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.Item;
 import io.qameta.allure.Step;
-import io.bugreaper.modules.minio.exceptions.MinioHelperException;
-import io.bugreaper.modules.minio.interfaces.MinioConfig;
-import io.bugreaper.modules.minio.interfaces.MinioInt;
+import net.bugreaper.modules.minio.exceptions.MinioHelperException;
+import net.bugreaper.modules.minio.interfaces.MinioConfig;
+import net.bugreaper.modules.minio.interfaces.MinioInt;
+import net.bugreaper.core.assertable.AssertableStringList;
+import net.bugreaper.core.config.YamlUtils;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
 import org.opentest4j.AssertionFailedError;
@@ -29,13 +29,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static io.bugreaper.core.allurereporter.AllureReporter.attachJson;
-import static io.bugreaper.core.assertions.Asserts.*;
-import static io.bugreaper.core.filereaders.pathfinder.ProjectPaths.getTestResourcesPath;
-import static io.bugreaper.core.mappers.StringMappers.formatMilliseconds;
-import static io.bugreaper.core.utils.AwaitUtils.awaitCustom;
-import static io.bugreaper.core.allurereporter.AllureReporter.attachFromList;
-import static io.bugreaper.core.filereaders.ResourcesFileReader.getResourceFileSize;
+import static net.bugreaper.core.allurereporter.AllureReporter.attachJson;
+import static net.bugreaper.core.assertions.Asserts.*;
+import static net.bugreaper.core.filereaders.pathfinder.ProjectPaths.getTestResourcesPath;
+import static net.bugreaper.core.mappers.StringMappers.formatMilliseconds;
+import static net.bugreaper.core.utils.AwaitUtils.awaitCustom;
+import static net.bugreaper.core.allurereporter.AllureReporter.attachFromList;
+import static net.bugreaper.core.filereaders.ResourcesFileReader.getResourceFileSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 

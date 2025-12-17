@@ -1,7 +1,7 @@
-package io.bugreaper.modules.minio.interfaces;
+package net.bugreaper.modules.minio.interfaces;
 
-import io.bugreaper.core.assertable.AssertableStringList;
-import io.bugreaper.modules.minio.exceptions.MinioHelperException;
+import net.bugreaper.modules.minio.exceptions.MinioHelperException;
+import net.bugreaper.core.assertable.AssertableStringList;
 import org.awaitility.core.ConditionTimeoutException;
 import org.opentest4j.AssertionFailedError;
 

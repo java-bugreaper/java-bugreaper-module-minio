@@ -1,7 +1,7 @@
-package io.bugreaper.modules.minio;
+package net.bugreaper.modules.minio;
 
 
-import io.bugreaper.modules.minio.exceptions.MinioHelperException;
+import net.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;

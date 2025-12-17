@@ -1,4 +1,4 @@
-package io.bugreaper.modules.minio;
+package net.bugreaper.modules.minio;
 
 import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.MatcherAssert;
@@ -8,7 +8,7 @@ import org.opentest4j.AssertionFailedError;
 import testcontainers.MinioSetup;
 
 
-import static io.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
+import static net.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

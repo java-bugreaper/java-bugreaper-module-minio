@@ -9,7 +9,7 @@ plugins {
 
 description = 'BugReaper module for interaction with Minio'
 
-group = 'io.gitlab.ambu550'
+group = 'net.bugreaper'
 version = properties["VERSION_NAME"].toString()
 
 java {
@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    api 'io.gitlab.ambu550:bugreaper-core:0.2.2'
+    api 'net.bugreaper:core:1.0.0'
 
     api 'io.minio:minio:8.5.17'
 

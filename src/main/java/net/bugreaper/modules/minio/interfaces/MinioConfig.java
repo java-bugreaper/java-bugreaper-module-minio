@@ -1,6 +1,6 @@
-package io.bugreaper.modules.minio.interfaces;
+package net.bugreaper.modules.minio.interfaces;
 
-import io.bugreaper.modules.minio.Minio;
+import net.bugreaper.modules.minio.Minio;
 
 
 /**
