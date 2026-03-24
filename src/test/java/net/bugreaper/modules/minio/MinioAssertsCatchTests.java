@@ -1,10 +1,8 @@
 package net.bugreaper.modules.minio;
 
-import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 import testcontainers.MinioSetup;
 
 
@@ -14,10 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
+@SuppressWarnings("java:S5778")
 class MinioAssertsCatchTests {
 
     private final Minio minio = MinioSetup.getInstance().getMinio();
-    private final Minio minioFastAwait = MinioSetup.getInstance().getMinio().withAwaitMs(300);
+    private final Minio minioFastAwait = MinioSetup.getInstance().getMinio().setAwaitMs(300);
 
     private static final String TEST_FILE = "data/test_file_1.txt";
 
@@ -32,11 +31,11 @@ class MinioAssertsCatchTests {
         minioFastAwait.uploadFileToBucket(bucket, TEST_FILE, "test1");
         minioFastAwait.uploadFileToBucket(bucket, TEST_FILE, "test2");
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketIsEmpty(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> is not empty (contains 2 object/s) within 300 milliseconds", bucket),
+                String.format("Bucket <%s> expected to be empty but has 2 object/s within 300 milliseconds", bucket),
                 exception.getMessage());
     }
 
@@ -47,11 +46,11 @@ class MinioAssertsCatchTests {
         minioFastAwait.createBucket(bucket);
         minioFastAwait.cleanBucket(bucket);
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketIsNotEmpty(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> is empty within 300 milliseconds", bucket),
+                String.format("Bucket <%s> expected to be not empty but has no objects within 300 milliseconds", bucket),
                 exception.getMessage());
     }
 
@@ -59,7 +58,7 @@ class MinioAssertsCatchTests {
     void seeBucketExistsFailedTest() {
         var bucketNotExists = "not-exists-bucket";
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketExists(bucketNotExists));
 
         assertEquals(
@@ -74,11 +73,11 @@ class MinioAssertsCatchTests {
 
         minioFastAwait.createBucket(bucket);
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketDoesNotExist(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> exists within 300 milliseconds", bucket),
+                String.format("Bucket <%s> unexpected exists within 300 milliseconds", bucket),
                 exception.getMessage(),
                 "Error on check bucket not exists fail");
     }
@@ -92,7 +91,7 @@ class MinioAssertsCatchTests {
         minioFastAwait.cleanBucket(bucket);
         minioFastAwait.seeObjectDoesNotExist(bucket, object);
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeObjectExists(bucket, object));
 
         assertEquals(
@@ -111,13 +110,39 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "dir/" + object);
 
         minioFastAwait.seeObjectDoesNotExist(bucket, object);
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeObjectExists(bucket, object));
 
         assertEquals(
                 String.format("Object <%s> does not exist in bucket <%s> within 300 milliseconds", object, bucket),
                 exception.getMessage(),
                 "Error on check object exists fail");
+    }
+
+    @Test
+    void specificAwaitTest() {
+        var bucket = "for-with-await";
+        var object = "object_test_dummy_a";
+
+        minioFastAwait.createBucket(bucket);
+        minioFastAwait.cleanBucket(bucket);
+
+        Throwable exception = assertThrows(AssertionError.class, () ->
+                minioFastAwait.withAwaitMs(400).seeObjectExists(bucket, object));
+
+        assertEquals(
+                String.format("Object <%s> does not exist in bucket <%s> within 400 milliseconds", object, bucket),
+                exception.getMessage(),
+                "await from specific global");
+
+        minioFastAwait.cleanBucket(bucket);
+        Throwable exception2 = assertThrows(AssertionError.class, () ->
+                minioFastAwait.seeObjectExists(bucket, object));
+
+        assertEquals(
+                String.format("Object <%s> does not exist in bucket <%s> within 300 milliseconds", object, bucket),
+                exception2.getMessage(),
+                "await rollback to global");
     }
 
     @Test
@@ -129,7 +154,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, object);
 
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeObjectDoesNotExist(bucket, object));
 
         assertEquals(
@@ -147,7 +172,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsExactly(bucket,3));
 
         MatcherAssert.assertThat(
@@ -164,7 +189,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsLessThan(bucket, 1));
 
         MatcherAssert.assertThat(
@@ -181,7 +206,7 @@ class MinioAssertsCatchTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "object2.txt");
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsGreaterThan(bucket, 2));
 
         MatcherAssert.assertThat(
@@ -202,7 +227,7 @@ class MinioAssertsCatchTests {
 
         minio.uploadFileToBucket(TEST_BUCKET, fileName, object);
 
-        Throwable exception = assertThrows(AssertionFailedError.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeExactly(TEST_BUCKET, object, expectedBytes - 1 ));
 
         MatcherAssert.assertThat(
@@ -210,7 +235,7 @@ class MinioAssertsCatchTests {
                 exception.getMessage(),
                 StringContains.containsString("Object <object_size.txt> size from bucket <bucket-test> expected to be equal <179> bytes but got <180>"));
 
-        Throwable exceptionLess = assertThrows(AssertionFailedError.class, () ->
+        Throwable exceptionLess = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, expectedBytes ));
 
         MatcherAssert.assertThat(
@@ -218,7 +243,7 @@ class MinioAssertsCatchTests {
                 exceptionLess.getMessage(),
                 is("Object <object_size.txt> size from bucket <bucket-test> expected to be less <180> bytes but got <180>"));
 
-        Throwable exceptionGreater = assertThrows(AssertionFailedError.class, () ->
+        Throwable exceptionGreater = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, expectedBytes ));
 
         MatcherAssert.assertThat(
@@ -239,7 +264,7 @@ class MinioAssertsCatchTests {
 
         minio.uploadFileToBucket(TEST_BUCKET, fileName, object);
 
-        Throwable exception = assertThrows(AssertionFailedError.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeExactly(TEST_BUCKET, object, expectedBytes + 1 ));
 
         MatcherAssert.assertThat(
@@ -247,7 +272,7 @@ class MinioAssertsCatchTests {
                 exception.getMessage(),
                 StringContains.containsString("Object <object_size2.txt> size from bucket <bucket-test> expected to be equal <181> bytes but got <180>"));
 
-        Throwable exceptionLess = assertThrows(AssertionFailedError.class, () ->
+        Throwable exceptionLess = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, 121 ));
 
         MatcherAssert.assertThat(
@@ -255,7 +280,7 @@ class MinioAssertsCatchTests {
                 exceptionLess.getMessage(),
                 is("Object <object_size2.txt> size from bucket <bucket-test> expected to be less <121> bytes but got <180>"));
 
-        Throwable exceptionGreater = assertThrows(AssertionFailedError.class, () ->
+        Throwable exceptionGreater = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, 215 ));
 
         MatcherAssert.assertThat(

@@ -15,16 +15,26 @@ public interface MinioConfig {
      * Configure download buffer size
      *
      * @param downloadBufferSize buffer size for file upload
-     * @return this instance {@link Minio}
+     * @return this instance for method chaining
      * @throws IllegalArgumentException on invalid setup
      */
-    Minio withDownloadBufferSize(int downloadBufferSize);
+    Minio setDownloadBufferSize(int downloadBufferSize);
 
     /**
-     * Configure await in asserts with await
+     * Configure global await for asserts with await
      *
      * @param awaitMs ms await
-     * @return this instance {@link Minio}
+     * @return this instance for method chaining
+     * @throws IllegalArgumentException on invalid setup
+     */
+    Minio setAwaitMs(int awaitMs);
+
+    /**
+     * Configure await for next assert with await (than await rollback to global)
+     * global {@link #setAwaitMs(int)} will be ignored
+     *
+     * @param awaitMs ms await
+     * @return this instance for method chaining
      * @throws IllegalArgumentException on invalid setup
      */
     Minio withAwaitMs(int awaitMs);
@@ -33,19 +43,19 @@ public interface MinioConfig {
      * Configure max size for file to upload
      *
      * @param maxUploadSize max size in bytes for file to upload
-     * @return this instance {@link Minio}
+     * @return this instance for method chaining
      * @throws IllegalArgumentException on invalid setup
      */
-    Minio withMaxUploadSize(int maxUploadSize);
+    Minio setMaxUploadSize(int maxUploadSize);
 
     /**
      * Configure max size for file to download/read
      *
      * @param maxDownloadObjectSize max size in bytes for object to download/read
-     * @return this instance {@link Minio}
+     * @return this instance for method chaining
      * @throws IllegalArgumentException on invalid setup
      */
-    Minio withMaxDownloadObjectSize(int maxDownloadObjectSize);
+    Minio setMaxDownloadObjectSize(int maxDownloadObjectSize);
 
     /**
      * Returns and logs (at INFO level) a human-readable summary of all resolved
