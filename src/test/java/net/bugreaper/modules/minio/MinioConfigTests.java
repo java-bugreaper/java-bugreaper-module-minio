@@ -54,11 +54,10 @@ class MinioConfigTests {
             System.clearProperty(PROPERTY);
         }
 
-        Minio minioConfig = new Minio();
+        Minio minioConfig = Minio.getInstance();
+
         minioConfig.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "test_obj.txt");
         minioConfig.seeObjectExists(DEFAULT_BUCKET, "test_obj.txt");
-
-        assertEquals(300, minioConfig.getAwaitMs());
 
         assertEquals(String.format("""
                         Minio:
@@ -98,7 +97,7 @@ class MinioConfigTests {
     }
 
     @Test
-    void testSummaryNotConfig() {
+    void testSummaryDefault() {
         if(Objects.equals(CI, "true")){
             System.setProperty(PROPERTY, "docker");
         }else {

@@ -18,10 +18,9 @@ class MinioConfigureValidationTests {
         Minio test = MinioSetup.getInstance().getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                test.withAwaitMs(-1));
+                test.setAwaitMs(-1));
 
         MatcherAssert.assertThat(
-                "Error on config .withAwaitMs negative validation",
                 exception.getMessage(),
                 StringContains.containsString("awaitMs too small (can`t bee less 200ms)"));
     }
@@ -32,10 +31,9 @@ class MinioConfigureValidationTests {
         Minio test = MinioSetup.getInstance().getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                test.withDownloadBufferSize(-1));
+                test.setDownloadBufferSize(-1));
 
         MatcherAssert.assertThat(
-                "Error on config .withDownloadBufferSize negative validation",
                 exception.getMessage(),
                 StringContains.containsString("downloadBufferSize too small (can`t bee less 1)"));
     }
@@ -46,10 +44,9 @@ class MinioConfigureValidationTests {
         Minio test = MinioSetup.getInstance().getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                test.withMaxUploadSize(-1));
+                test.setMaxUploadSize(-1));
 
         MatcherAssert.assertThat(
-                "Error on config .withMaxUploadSize negative validation",
                 exception.getMessage(),
                 StringContains.containsString("maxUploadSize too small (can`t bee less 1)"));
     }
@@ -60,12 +57,24 @@ class MinioConfigureValidationTests {
         Minio test = MinioSetup.getInstance().getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
-                test.withMaxDownloadObjectSize(-1));
+                test.setMaxDownloadObjectSize(-1));
 
         MatcherAssert.assertThat(
-                "Error on config .withMaxDownloadObjectSize negative validation",
                 exception.getMessage(),
                 StringContains.containsString("maxDownloadObjectSize too small (can`t bee less 1)"));
     }
 
+
+    @Test
+    void configLowWitAwaitTest() {
+
+        Minio test = MinioSetup.getInstance().getMinio();
+
+        Throwable exception = assertThrows(IllegalArgumentException.class, () ->
+                test.withAwaitMs(199));
+
+        MatcherAssert.assertThat(
+                exception.getMessage(),
+                StringContains.containsString("specificAwaitMs too small (can`t bee less 200ms)"));
+    }
 }

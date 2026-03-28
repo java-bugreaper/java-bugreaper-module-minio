@@ -2,7 +2,6 @@ package net.bugreaper.modules.minio;
 
 
 import net.bugreaper.modules.minio.exceptions.MinioHelperException;
-import org.awaitility.core.ConditionTimeoutException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SuppressWarnings("squid:S2699")
 class MinioConfigureTests {
 
-    private static final Minio minio = MinioSetup.getInstance().getMinio().withDownloadBufferSize(1000);
+    private static final Minio minio = MinioSetup.getInstance().getMinio().setDownloadBufferSize(1000);
 
 
     private static final Minio minioDownload = MinioSetup.getInstance().getMinio()
-            .withMaxDownloadObjectSize(10);
+            .setMaxDownloadObjectSize(10);
 
     private static final String DEFAULT_BUCKET = "bucket-configured";
     private static final String TEST_FILE = "data/test_file_1.txt";
@@ -51,7 +50,7 @@ class MinioConfigureTests {
         minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsExactly(bucket,3));
 
         MatcherAssert.assertThat(
@@ -62,7 +61,7 @@ class MinioConfigureTests {
 
     @Test
     void objectCountAssertFailedCustomAwaitTest() {
-        final Minio minioAwait = MinioSetup.getInstance().getMinio().withAwaitMs(200);
+        final Minio minioAwait = MinioSetup.getInstance().getMinio().setAwaitMs(200);
 
         var bucket = "count-bucket-200";
         minioAwait.createBucket(bucket);
@@ -70,7 +69,7 @@ class MinioConfigureTests {
         minioAwait.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
 
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioAwait.seeObjectsCountIsExactly(bucket,2));
 
         MatcherAssert.assertThat(
@@ -81,7 +80,7 @@ class MinioConfigureTests {
 
     @Test
     void objectCountAssertFailedCustomAwait2Test() {
-        final Minio minioAwait = MinioSetup.getInstance().getMinio().withAwaitMs(1200);
+        final Minio minioAwait = MinioSetup.getInstance().getMinio().setAwaitMs(1200);
 
         var bucket = "count-bucket-1200";
         minioAwait.createBucket(bucket);
@@ -89,7 +88,7 @@ class MinioConfigureTests {
         minioAwait.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
 
 
-        Throwable exception = assertThrows(ConditionTimeoutException.class, () ->
+        Throwable exception = assertThrows(AssertionError.class, () ->
                 minioAwait.seeObjectsCountIsExactly(bucket,2));
 
         MatcherAssert.assertThat(
@@ -126,7 +125,7 @@ class MinioConfigureTests {
     @Test
     void maxUploadTest() {
 
-        final Minio minioUpload = MinioSetup.getInstance().getMinio().withMaxUploadSize(30);
+        final Minio minioUpload = MinioSetup.getInstance().getMinio().setMaxUploadSize(30);
 
         var bucket = "count-upload";
         minioUpload.createBucket(bucket);
