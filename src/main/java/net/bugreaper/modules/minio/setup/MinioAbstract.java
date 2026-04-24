@@ -24,14 +24,16 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static net.bugreaper.core.allurereporter.AllureReporter.attachFromList;
 import static net.bugreaper.core.allurereporter.AllureReporter.attachJson;
 import static net.bugreaper.core.assertions.Asserts.*;
 import static net.bugreaper.core.filereaders.ResourcesFileReader.getResourceFileSize;
 import static net.bugreaper.core.filereaders.pathfinder.ProjectPaths.getTestResourcesPath;
+import static net.bugreaper.core.mappers.StringMappers.formatBytes;
 import static net.bugreaper.core.mappers.StringMappers.formatMilliseconds;
+import static net.bugreaper.core.url.BaseUrl.downloadFile;
+import static net.bugreaper.core.url.BaseUrl.readBody;
 import static net.bugreaper.core.utils.AwaitUtils.awaitCustom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -140,7 +142,7 @@ public class MinioAbstract {
                             .method(Method.GET)
                             .bucket(bucketName)
                             .object(objectName)
-                            .expiry(7, TimeUnit.DAYS)
+                            .expiry(12, TimeUnit.HOURS)
                             .build());
 
             attachJson(objectName + " shared link:", link);
@@ -155,6 +157,10 @@ public class MinioAbstract {
     }
 
     // Download/Read
+
+    protected void downloadObjectBySharedLinkMethod(String urlLink, String filePath){
+        downloadFile(urlLink, filePath);
+    }
 
     protected void downloadObjectFromBucketMethod(String bucketName, String objectName, String filePathName) {
 
@@ -181,7 +187,6 @@ public class MinioAbstract {
 
     }
 
-    //bug new line in end!
     protected String readObjectFromBucketMethod(String bucketName, String objectName) {
 
         checkDownloadSize(bucketName, objectName);
@@ -200,9 +205,7 @@ public class MinioAbstract {
                         .object(objectName)
                         .build())) {
 
-            return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.joining(System.lineSeparator()));
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
         } catch (Exception e) {
             throw new MinioHelperException(e);
@@ -402,6 +405,9 @@ public class MinioAbstract {
         return getObjectsListArrayNoReportMethod(bucketName).size();
     }
 
+    protected String getObjectsBySharedLinkMethod(String urlLink) {
+        return readBody(urlLink);
+    }
 
     // Asserts
     
@@ -535,8 +541,8 @@ public class MinioAbstract {
         assertEquals(
                 expectedSize,
                 getObjectSizeMethod(bucketName, objectName),
-                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be equal <{2}> bytes but got <{3}>",
-                        objectName, bucketName, expectedSize, getObjectSizeMethod(bucketName, objectName)));
+                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be equal <{2}> but got <{3}>",
+                        objectName, bucketName, formatBytes(expectedSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
     }
     
     protected void seeObjectSizeIsGreaterThanMethod(String bucketName, String objectName, long minSize) {
@@ -545,8 +551,8 @@ public class MinioAbstract {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) > minSize);
         } catch (AssertionFailedError e) {
-            fail(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> bytes but got <{3}>",
-                    objectName, bucketName, minSize, getObjectSizeMethod(bucketName, objectName)));
+            fail(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> but got <{3}>",
+                    objectName, bucketName, formatBytes(minSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
     }
     
@@ -556,8 +562,8 @@ public class MinioAbstract {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) < maxSize);
         } catch (AssertionFailedError e) {
-            fail(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> bytes but got <{3}>",
-                    objectName, bucketName, maxSize, getObjectSizeMethod(bucketName, objectName)));
+            fail(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> but got <{3}>",
+                    objectName, bucketName, formatBytes(maxSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
     }
 

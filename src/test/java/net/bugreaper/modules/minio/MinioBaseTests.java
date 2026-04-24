@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testcontainers.MinioSetup;
 
-import static helper.ApiExtractor.extractBody;
-
 import static net.bugreaper.core.filereaders.ResourcesFileReader.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -279,11 +277,20 @@ class MinioBaseTests {
         minio.createBucket(DEFAULT_BUCKET);
         minio.cleanBucket(DEFAULT_BUCKET);
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, object);
+
+        //share object
         String url = minio.shareObjectInBucket(DEFAULT_BUCKET, object);
 
-        String content = extractBody(url);
+        //read file check
+        String content = minio.getObjectsBySharedLink(url);
+        assertEquals(readResourceFile(TEST_FILE), content);
 
-        assertEquals(readResourceFile(TEST_FILE), content, "Shared object correct");
+
+        //download file check
+        String contentFile = "temp/shared_file.txt";
+        minio.downloadObjectBySharedLink(url, contentFile);
+        assertEquals(readResourceFile(TEST_FILE), readResourceFile(contentFile));
+
     }
 
     @Test

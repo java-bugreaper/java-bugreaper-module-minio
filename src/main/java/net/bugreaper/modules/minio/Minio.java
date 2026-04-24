@@ -15,43 +15,6 @@ import org.slf4j.LoggerFactory;
  *
  * <p>For one instance run recommended: {@code Minio minio = Minio.getInstance()}</p>
  *
- * <p><b>Buckets/Objects Interaction:</b>
- * {@link Minio#cleanBucket(String)},
- * {@link Minio#createBucket(String)},
- * {@link Minio#deleteEmptyBucket(String)},
- * {@link Minio#deleteFilledBucket(String)},
- * {@link Minio#deleteObjectFromBucket(String, String)},
- * {@link Minio#shareObjectInBucket(String, String)},
- *
- * <p><b>Asserts:</b>
- * {@link Minio#seeBucketExists(String)},
- * {@link Minio#seeBucketIsEmpty(String)},
- * {@link Minio#seeBucketIsNotEmpty(String)},
- * {@link Minio#seeBucketDoesNotExist(String)},
- * {@link Minio#seeObjectExists(String, String)},
- * {@link Minio#seeObjectDoesNotExist(String, String)},
- * {@link Minio#seeObjectSizeExactly(String, String, long)},
- * {@link Minio#seeObjectSizeIsGreaterThan(String, String, long)},
- * {@link Minio#seeObjectSizeIsLessThan(String, String, long)},
- * {@link Minio#seeObjectsCountIsExactly(String, int)},
- * {@link Minio#seeObjectsCountIsGreaterThan(String, int)},
- * {@link Minio#seeObjectsCountIsLessThan(String, int)}
- *
- * <p><b>Upload data:</b>
- * {@link Minio#uploadFileToBucket(String, String)}
- * {@link Minio#uploadFileToBucket(String, String, String)}
- * {@link Minio#uploadFileToBucket(String, String, String, String)}
- *
- * <p><b>Download data:</b>
- * {@link Minio#downloadObjectFromBucket(String, String, String)}
- *
- * <p><b>Get data:</b>
- * {@link Minio#getBucketsList()},
- * {@link Minio#getObjectsCountInBucket(String)},
- * {@link Minio#getObjectSize(String, String)},
- * {@link Minio#getObjectsList(String)},
- * {@link Minio#objectExistsStatus(String, String)},
- * {@link Minio#readObjectFromBucket(String, String)},
  *
  * <p> Await for some counts assert default: {@link Minio#awaitMs}, can be changed by: {@link Minio#setAwaitMs(int)}
  * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#setDownloadBufferSize(int)}
@@ -255,6 +218,12 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     // Download/Read
 
     @Override
+    @Step("(Minio) Download object by shared link")
+    public void downloadObjectBySharedLink(String urlLink, String filePath) {
+        downloadObjectBySharedLinkMethod(urlLink, filePath);
+    }
+
+    @Override
     @Step("(Minio) Download object: <{objectName}> from bucket: <{bucketName}> to file: <{filePathName}>")
     public void downloadObjectFromBucket(String bucketName, String objectName, String filePathName) {
         downloadObjectFromBucketMethod(bucketName, objectName, filePathName);
@@ -327,7 +296,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio) Show buckets list")
+    @Step("(Minio) Get buckets list")
     public AssertableStringList getBucketsList() {
         return getBucketsListMethod();
     }
@@ -336,6 +305,12 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     @Override
     public int getObjectsCountInBucket(String bucketName) {
         return getObjectsCountInBucketMethod(bucketName);
+    }
+
+    @Override
+    @Step("(Minio) Get object by shared link")
+    public String getObjectsBySharedLink(String urlLink) {
+        return getObjectsBySharedLinkMethod(urlLink);
     }
 
 
