@@ -233,7 +233,7 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exception.getMessage(),
-                StringContains.containsString("Object <object_size.txt> size from bucket <bucket-test> expected to be equal <179> bytes but got <180>"));
+                StringContains.containsString("Object <object_size.txt> size from bucket <bucket-test> expected to be equal <179 bytes> but got <180 bytes>"));
 
         Throwable exceptionLess = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, expectedBytes ));
@@ -241,15 +241,15 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionLess.getMessage(),
-                is("Object <object_size.txt> size from bucket <bucket-test> expected to be less <180> bytes but got <180>"));
+                is("Object <object_size.txt> size from bucket <bucket-test> expected to be less <180 bytes> but got <180 bytes>"));
 
         Throwable exceptionGreater = assertThrows(AssertionError.class, () ->
-                minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, expectedBytes ));
+                minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, 1024 ));
 
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionGreater.getMessage(),
-                is("Object <object_size.txt> size from bucket <bucket-test> expected to be greater <180> bytes but got <180>"));
+                is("Object <object_size.txt> size from bucket <bucket-test> expected to be greater <1Kb> but got <180 bytes>"));
     }
 
     @Test
@@ -270,7 +270,7 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exception.getMessage(),
-                StringContains.containsString("Object <object_size2.txt> size from bucket <bucket-test> expected to be equal <181> bytes but got <180>"));
+                StringContains.containsString("Object <object_size2.txt> size from bucket <bucket-test> expected to be equal <181 bytes> but got <180 bytes>"));
 
         Throwable exceptionLess = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, 121 ));
@@ -278,15 +278,15 @@ class MinioAssertsCatchTests {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionLess.getMessage(),
-                is("Object <object_size2.txt> size from bucket <bucket-test> expected to be less <121> bytes but got <180>"));
+                is("Object <object_size2.txt> size from bucket <bucket-test> expected to be less <121 bytes> but got <180 bytes>"));
 
         Throwable exceptionGreater = assertThrows(AssertionError.class, () ->
-                minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, 215 ));
+                minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, 1024*1024+1 ));
 
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionGreater.getMessage(),
-                is("Object <object_size2.txt> size from bucket <bucket-test> expected to be greater <215> bytes but got <180>"));
+                is("Object <object_size2.txt> size from bucket <bucket-test> expected to be greater <1Mb 1 byte> but got <180 bytes>"));
     }
 
 }

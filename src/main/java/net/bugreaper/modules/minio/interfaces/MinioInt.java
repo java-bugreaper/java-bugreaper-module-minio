@@ -1,5 +1,6 @@
 package net.bugreaper.modules.minio.interfaces;
 
+import net.bugreaper.core.exceptions.BaseUrlException;
 import net.bugreaper.modules.minio.exceptions.MinioHelperException;
 import net.bugreaper.core.assertable.AssertableStringList;
 
@@ -85,11 +86,37 @@ public interface MinioInt {
     void deleteObjectFromBucket(String bucketName, String objectName);
 
     /**
+     * Downloads a file from the given URL and saves it to the specified local file path <b>in test resources</b>.
+     *
+     * <p><i>You can check this file with core features</i></p>
+     * <pre>
+     * Minio minio = Minio.getInstance();
+     * FileHelper fileHelper = new FileHelper();
+     *
+     * minio.downloadObjectBySharedLink("http://...". "minio/my-file.txt");
+     * fileHelper.seeFileContainString("minio/my-file.txt", "Hello");
+     * </pre>
+     *
+     * @param urlLink   the URL of the shared file to download
+     * @param filePath file path (including file name) in test-resources (example: "minio/my-file.txt")
+     * @throws BaseUrlException on download error
+     */
+    void downloadObjectBySharedLink(String urlLink, String filePath);
+
+    /**
      * Download object to file in test resources
      *
+     * <p><i>You can check this file with core features</i></p>
+     * <pre>
+     * Minio minio = Minio.getInstance();
+     * FileHelper fileHelper = new FileHelper();
+     *
+     * minio.downloadObjectBySharedLink("...". "minio/my-file.txt");
+     * fileHelper.seeFileContainString("minio/my-file.txt", "Hello")
+     * </pre>
      * @param bucketName   bucket name
      * @param objectName   object path/name
-     * @param filePathName file path/name (in test resources)
+     * @param filePathName file path (including file name) in test-resources (example: "minio/my-file.txt")
      * @throws MinioHelperException on Minio errors
      */
     void downloadObjectFromBucket(String bucketName, String objectName, String filePathName);
@@ -113,6 +140,13 @@ public interface MinioInt {
      * @throws MinioHelperException on Minio errors
      */
     int getObjectsCountInBucket(String bucketName);
+
+    /**
+     * Executes an HTTP GET request to the given URL and returns the response body as a string.
+     *
+     * @param urlLink the URL of the shared file to download
+     */
+    String getObjectsBySharedLink(String urlLink);
 
     /**
      * Return object size in bytes
@@ -246,7 +280,7 @@ public interface MinioInt {
     void seeObjectSizeIsLessThan(String bucketName, String objectName, long maxSize);
 
     /**
-     * Share object and return url
+     * Share (for 12 hours) object and return url
      *
      * @param bucketName bucket name
      * @param objectName object path/name
