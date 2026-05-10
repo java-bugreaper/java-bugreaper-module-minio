@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 
 @SuppressWarnings("squid:S5960")
-public class MinioAbstract {
+public abstract class MinioAbstract {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
 

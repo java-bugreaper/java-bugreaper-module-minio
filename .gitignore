@@ -5,7 +5,5 @@
 /build/
 /allure-results/
 
-build.gradle
-
 ### local releases ###
 *release*.tar.gz

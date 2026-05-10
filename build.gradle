@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    api 'net.bugreaper:core:1.2.0'
+    api 'net.bugreaper:core:1.3.0'
 
     api 'io.minio:minio:8.5.17'
 
