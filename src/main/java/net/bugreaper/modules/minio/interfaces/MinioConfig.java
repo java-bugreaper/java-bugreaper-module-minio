@@ -4,9 +4,8 @@ import net.bugreaper.modules.minio.Minio;
 
 
 /**
- * Interface for Minio config methods
- *
- * @author ambu550
+ * Interface that defines helper configuration methods for helper operations.
+ * Validates that all required methods are implemented.
  */
 public interface MinioConfig {
 

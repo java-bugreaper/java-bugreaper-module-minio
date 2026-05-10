@@ -6,9 +6,8 @@ import net.bugreaper.core.assertable.AssertableStringList;
 
 
 /**
- * Interface for Minio test methods
- *
- * @author ambu550
+ * Interface defines methods for facilitating helper interactions and assertions.
+ * Validates that all required methods are implemented.
  */
 public interface MinioInt {
 
@@ -145,6 +144,7 @@ public interface MinioInt {
      * Executes an HTTP GET request to the given URL and returns the response body as a string.
      *
      * @param urlLink the URL of the shared file to download
+     * @return String with data from object
      */
     String getObjectsBySharedLink(String urlLink);
 
@@ -191,7 +191,8 @@ public interface MinioInt {
     String readObjectFromBucket(String bucketName, String objectName);
 
     /**
-     * Assert that bucket exists (with await)
+     * Assert that bucket exists
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
      * @throws AssertionError       on assert fail
@@ -200,7 +201,8 @@ public interface MinioInt {
     void seeBucketExists(String bucketName);
 
     /**
-     * Assert that bucket is empty (with await)
+     * Assert that bucket is empty
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
      * @throws AssertionError       on assert fail
@@ -209,7 +211,8 @@ public interface MinioInt {
     void seeBucketIsEmpty(String bucketName);
 
     /**
-     * Assert that bucket is not empty (with await)
+     * Assert that bucket is not empty
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
      * @throws AssertionError       on assert fail
@@ -218,7 +221,8 @@ public interface MinioInt {
     void seeBucketIsNotEmpty(String bucketName);
 
     /**
-     * Assert that bucket does not exist (with await)
+     * Assert that bucket does not exist
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
      * @throws AssertionError       on assert fail
@@ -227,7 +231,8 @@ public interface MinioInt {
     void seeBucketDoesNotExist(String bucketName);
 
     /**
-     * Assert that object exists (with await)
+     * Assert that object exists
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
      * @param objectName object path/name
@@ -284,7 +289,7 @@ public interface MinioInt {
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @return link for object download
+     * @return String with link for object download
      * @throws MinioHelperException on other Minio errors
      */
     String shareObjectInBucket(String bucketName, String objectName);

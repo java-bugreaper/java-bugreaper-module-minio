@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * <p>For one instance run recommended: {@code Minio minio = Minio.getInstance()}</p>
  *
  *
- * <p> Await for some counts assert default: {@link Minio#awaitMs}, can be changed by: {@link Minio#setAwaitMs(int)}
+ * <p> Await for some asserts default: {@link Minio#awaitMs}, can be changed by: {@link Minio#setAwaitMs(int)}
  * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#setDownloadBufferSize(int)}
  * <p> Max read/download object size default: {@link Minio#maxDownloadObjectSize}, can be changed by: {@link Minio#setMaxDownloadObjectSize(int)}
  * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed by: {@link Minio#setMaxUploadSize(int)}
@@ -55,7 +55,11 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     /**
-     * Run {@link #Minio()} from config in one instance
+     * Returns the instance of {@link Minio} with config builder {@link #Minio()}.
+     * <p>
+     * This implementation is thread-safe using method-level synchronization.
+     *
+     * @return the singleton instance of {@link Minio}
      */
     public static Minio getInstance() {
         if (instance == null) {
@@ -272,8 +276,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
         cleanBucketMethod(bucketName);
     }
 
-
-    // Statuses
+    // Get
 
     //not need step
     @Override
@@ -286,8 +289,6 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     public AssertableStringList getObjectsList(String bucketName) {
         return getObjectsListForAssertMethod(bucketName);
     }
-
-    // Get info
 
     //not need step
     @Override
