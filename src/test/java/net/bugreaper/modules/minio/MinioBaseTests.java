@@ -60,6 +60,15 @@ class MinioBaseTests {
     }
 
     @Test
+    void pushFileWithContentTypeTest() {
+        String obj = "dir/test2.obj";
+
+        minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, obj, "text/html");
+        minio.seeObjectExists(DEFAULT_BUCKET, obj);
+
+    }
+
+    @Test
     void pushFileWithOtherObjectNameTest() {
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "test_obj.txt");
         minio.seeObjectExists(DEFAULT_BUCKET, "test_obj.txt");

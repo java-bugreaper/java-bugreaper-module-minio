@@ -61,7 +61,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
      *
      * @return the singleton instance of {@link Minio}
      */
-    public static Minio getInstance() {
+    public static synchronized Minio getInstance() {
         if (instance == null) {
             instance = new Minio();
         }
