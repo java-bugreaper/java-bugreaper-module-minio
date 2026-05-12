@@ -231,7 +231,7 @@ public interface MinioInt {
     void seeBucketDoesNotExist(String bucketName);
 
     /**
-     * Assert that object exists
+     * Assert that object exists in bucket
      * <p><b>with await</b>
      *
      * @param bucketName bucket name
