@@ -9,7 +9,6 @@
     </appender>
 
 
-<!--<logger name="org.apache.activemq.artemis.api.core" level="DEBUG" />-->
     <logger name="bugreaper-module-minio" level="DEBUG" />
     <logger name="com.github.dockerjava.zerodep.shaded" level="INFO" />
 

@@ -1,9 +1,14 @@
 package net.bugreaper.modules.minio;
 
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import ch.qos.logback.classic.Level;
+import com.fasterxml.jackson.databind.JsonNode;
+import net.bugreaper.core.utils.AllureAssert;
+import net.bugreaper.core.utils.AllureResultLoader;
+import net.bugreaper.core.utils.LogWatcher;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.StringContains;
+import org.junit.jupiter.api.*;
 import testcontainers.MinioSetup;
 
 import static net.bugreaper.core.filereaders.ResourcesFileReader.*;
@@ -11,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SuppressWarnings("squid:S2699")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MinioBaseTests {
 
     private static final Minio minio = MinioSetup.getInstance().getMinio();
@@ -31,6 +37,17 @@ class MinioBaseTests {
         minio.cleanBucket(DEFAULT_BUCKET);
     }
 
+    private LogWatcher logWatcher;
+    @BeforeEach
+    void setup() {
+        logWatcher = new LogWatcher("bugreaper-module-minio", Level.DEBUG);
+    }
+
+    @AfterEach
+    void teardown() {
+        logWatcher.detach();
+    }
+
     @Test
     void createExistingFilledBucketTest() {
         String bucket = "recreate";
@@ -40,6 +57,10 @@ class MinioBaseTests {
 
         minio.createBucket(bucket);
         minio.seeBucketIsNotEmpty(bucket);
+
+        MatcherAssert.assertThat(
+                logWatcher.getLoggedEvents(Level.INFO).toString(),
+                StringContains.containsString(String.format("Bucket <%s> already exist", bucket)));
     }
 
     @Test
@@ -57,6 +78,10 @@ class MinioBaseTests {
 
         minio.deleteObjectFromBucket(DEFAULT_BUCKET, obj);
         minio.seeObjectDoesNotExist(DEFAULT_BUCKET, obj);
+
+        MatcherAssert.assertThat(
+                logWatcher.getLoggedEvents(Level.INFO).toString(),
+                StringContains.containsString(String.format("Object <%s> in <%s> successfully deleted", obj, DEFAULT_BUCKET)));
     }
 
     @Test
@@ -178,16 +203,33 @@ class MinioBaseTests {
     }
 
     @Test
+    @Order(1)
     void getObjectsListTest() {
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "object1.txt");
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "test/object2.txt");
         minio.uploadFileToBucket(DEFAULT_BUCKET, TEST_FILE, "object1.txt");
 
+        minio.shareObjectInBucket(DEFAULT_BUCKET, "object1.txt");
 
         minio.getObjectsList(DEFAULT_BUCKET)
                 .seeListHasExactlyCount(2)
                 .seeListAnyEquals("object1.txt")
                 .seeListAnyContains("test/object2.txt");
+    }
+
+
+    @Test
+    @Order(2)
+    void allureForListCheck() {
+        JsonNode result = AllureResultLoader.loadByTestName("getObjectsListTest");
+
+        AllureAssert.assertThat(result)
+                .hasStep("(Minio) Upload file: data/test_file_1.txt to bucket: <new-bucket> like object: <object1.txt>")
+                .hasStep("(Assert) List should have count EQUAL to: <2>")
+                .hasStep("(Minio) Share object: <object1.txt> from bucket: <new-bucket>")
+                .hasAttachment("object1.txt shared link:")
+                .hasStep("(Assert) List should have STRING EQUAL to: <object1.txt>")
+                .hasStep("(Assert) List should have STRING CONTAINS: <test/object2.txt>");
     }
 
     @Test
@@ -252,6 +294,18 @@ class MinioBaseTests {
         minio.deleteFilledBucket(bucket);
         minio.seeBucketDoesNotExist(bucket);
 
+        final String logs = logWatcher.getLoggedEvents(Level.INFO).toString();
+
+        MatcherAssert.assertThat(
+                logs,
+                StringContains.containsString(String.format("Bucket <%s> successfully created", bucket)));
+        MatcherAssert.assertThat(
+                logs,
+                StringContains.containsString(String.format("Objects(1) in <%s> successfully deleted", bucket)));
+
+        MatcherAssert.assertThat(
+                logs,
+                StringContains.containsString(String.format("Bucket <%s> successfully deleted", bucket)));
     }
 
     @Test

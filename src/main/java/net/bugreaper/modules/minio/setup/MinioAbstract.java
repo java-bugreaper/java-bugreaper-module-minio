@@ -229,7 +229,7 @@ public abstract class MinioAbstract {
             minioCl.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             logger.info("Bucket <{}> successfully created", bucketName);
         } catch (ErrorResponseException e) {
-            if (e.errorResponse().message().contains("already own it")) {
+            if ("BucketAlreadyOwnedByYou".equals(e.errorResponse().code())) {
                 logger.info("Bucket <{}> already exist", bucketName);
             } else {
                 throw new MinioHelperException("Error occurred: " + e.getMessage());
@@ -247,10 +247,10 @@ public abstract class MinioAbstract {
             logger.info("Bucket <{}> successfully deleted", bucketName);
 
         } catch (ErrorResponseException e) {
-            if ("The bucket you tried to delete is not empty".equals(e.errorResponse().message())) {
+            if ("BucketNotEmpty".equals(e.errorResponse().code())) {
                 throw new MinioHelperException(String.format("Bucket <%s> not empty", bucketName), e);
 
-            } else if ("The specified bucket does not exist".equals(e.errorResponse().message())) {
+            } else if ("NoSuchBucket".equals(e.errorResponse().code())) {
                 throw new MinioHelperException(String.format("Bucket <%s> does not exist", bucketName), e);
 
             } else {
@@ -280,13 +280,15 @@ public abstract class MinioAbstract {
         Iterable<Result<Item>> results = getObjectsListItemsMethod(bucketName);
 
         try {
+            int count = 0;
             for (Result<Item> result : results) {
                 Item item = result.get();
                 logger.debug("Object {} for delete", item.objectName());
                 minioCl.removeObject(
                         RemoveObjectArgs.builder().bucket(bucketName).object(item.objectName()).build());
+                count++;
             }
-            logger.info("Objects in <{}> successfully deleted", bucketName);
+            logger.info("Objects({}) in <{}> successfully deleted", count, bucketName);
         } catch (Exception e) {
             throw new MinioHelperException(e);
         }
@@ -311,7 +313,7 @@ public abstract class MinioAbstract {
             if ("NoSuchKey".equals(e.errorResponse().code())) {
                 return false;
 
-            } else if ("The specified bucket does not exist".equals(e.errorResponse().message())) {
+            } else if ("NoSuchBucket".equals(e.errorResponse().code())) {
                 throw new MinioHelperException("Bucket <" + bucketName + "> does not exist", e);
 
             } else {
