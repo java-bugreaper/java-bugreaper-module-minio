@@ -20,7 +20,7 @@ public interface MinioConfig {
     Minio setDownloadBufferSize(int downloadBufferSize);
 
     /**
-     * Configure global await for asserts with await
+     * Sets the global await timeout (in milliseconds) used by all operations with await
      *
      * @param awaitMs ms await
      * @return this instance for method chaining

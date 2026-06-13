@@ -181,7 +181,7 @@ public interface MinioInt {
     boolean objectExistsStatus(String bucketName, String objectName);
 
     /**
-     * Read object from bucket
+     * Read and return String with object data
      *
      * @param bucketName bucket name
      * @param objectName object path/name

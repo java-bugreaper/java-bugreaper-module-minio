@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class consists methods that operate with Minio
  *
- * <p>For one instance run recommended: {@code Minio minio = Minio.getInstance()}</p>
+ * <p>For one instance run recommended: {@code Minio minio = Minio.getInstance();}</p>
  *
  *
  * <p> Await for some asserts default: {@link Minio#awaitMs}, can be changed by: {@link Minio#setAwaitMs(int)}
@@ -196,13 +196,13 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     // Upload
 
     @Override
-    @Step("(Minio) Upload file: {filePathName} to bucket:<{bucketName}>")
+    @Step("(Minio) Upload file: {filePathName} to bucket: <{bucketName}>")
     public void uploadFileToBucket(String bucketName, String filePathName) {
         uploadFileToBucketMethod(bucketName, filePathName);
     }
 
     @Override
-    @Step("(Minio) Upload file: {filePathName} to bucket:<{bucketName}> like object:<{objectName}>")
+    @Step("(Minio) Upload file: {filePathName} to bucket: <{bucketName}> like object: <{objectName}>")
     public void uploadFileToBucket(String bucketName, String filePathName, String objectName) {
         uploadFileToBucketMethod(bucketName, filePathName, objectName, "text/plain");
     }
@@ -250,7 +250,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio) Delete empty: <{bucketName}>")
+    @Step("(Minio) Delete empty bucket: <{bucketName}>")
     public void deleteEmptyBucket(String bucketName) {
 
         deleteEmptyBucketMethod(bucketName);
