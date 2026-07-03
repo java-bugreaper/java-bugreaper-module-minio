@@ -36,7 +36,6 @@ import static net.bugreaper.core.url.BaseUrl.downloadFile;
 import static net.bugreaper.core.url.BaseUrl.readBody;
 import static net.bugreaper.core.utils.AwaitUtils.awaitCustom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 
 @SuppressWarnings("squid:S5960")
@@ -52,22 +51,26 @@ public abstract class MinioAbstract {
     private MinioClient minioCl;
     
     private final String resPath = getTestResourcesPath();
- 
+
+    /**
+     * default ms await in tests
+     */
+    protected volatile int awaitMs = 2000;
 
     /**
      * default buffer for file download in bytes
      */
-    protected int downloadBufferSize = 1024 * 10;
+    protected volatile int downloadBufferSize = 1024 * 10;
 
     /**
      * default max file size for upload
      */
-    protected int maxUploadFileSize = 1024 * 20;
+    protected volatile int maxUploadFileSize = 1024 * 20;
 
     /**
      * default max object size for download
      */
-    protected int maxDownloadObjectSize = 1024 * 50;
+    protected volatile int maxDownloadObjectSize = 1024 * 50;
 
     
     protected MinioAbstract(String url, int port, String username, String password) {
@@ -77,11 +80,25 @@ public abstract class MinioAbstract {
         this.password = password;
 
         createConnect(this.url, this.port, this.username, this.password);
+        Runtime.getRuntime().addShutdownHook(createShutdownHook());
     }
 
-    protected MinioAbstract() {}
+    protected MinioAbstract() {
+        Runtime.getRuntime().addShutdownHook(createShutdownHook());
+    }
 
-
+    Thread createShutdownHook() {
+        return new Thread(() -> {
+            try {
+                if (minioCl != null) {
+                    minioCl.close();
+                    logger.debug("Minio client closed: {}", minioCl);
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to close Minio client: ", e);
+            }
+        }, "minio-client-shutdown");
+    }
 
     protected void createConnect(String url, int port, String username, String password) {
         this.minioCl = MinioClient.builder()
@@ -89,7 +106,6 @@ public abstract class MinioAbstract {
                 .credentials(username, password)
                 .build();
     }
-
   
 
     // Upload
@@ -423,7 +439,7 @@ public abstract class MinioAbstract {
             //allure report & info log
             getObjectsListArrayMethod(bucketName, true);
 
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Bucket <{0}> expected to be empty but has {1} object/s within {2}",
                             bucketName, getObjectsCountInBucketMethod(bucketName), formatMilliseconds(providedAwait)));
@@ -437,7 +453,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertGreaterThanExpected(0, getObjectsCountInBucketMethod(bucketName)));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Bucket <{0}> expected to be not empty but has no objects within {1}",
                             bucketName, formatMilliseconds(providedAwait)));
@@ -451,7 +467,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertBooleans(true, bucketExistingStatus(bucketName)));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Bucket <{0}> does not exist within {1}",
                             bucketName, formatMilliseconds(providedAwait)));
@@ -464,7 +480,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertBooleans(false, bucketExistingStatus(bucketName)));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Bucket <{0}> unexpected exists within {1}",
                             bucketName, formatMilliseconds(providedAwait)));
@@ -477,7 +493,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertBooleans(true, objectExistsStatusMethod(bucketName, objectName)));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Object <{0}> does not exist in bucket <{1}> within {2}",
                             objectName, bucketName, formatMilliseconds(providedAwait)));
@@ -490,7 +506,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertBooleans(false, objectExistsStatusMethod(bucketName, objectName)));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Object <{0}> exists in bucket <{1}> within {2}",
                             objectName, bucketName, formatMilliseconds(providedAwait)));
@@ -504,7 +520,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertIntEquals(expectedCount, getObjectsListArrayNoReportMethod(bucketName).size()));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be EXACTLY <{1}> but got <{2}> within {3}",
                             bucketName, expectedCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
@@ -518,7 +534,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertGreaterThanExpected(minCount, getObjectsListArrayNoReportMethod(bucketName).size()));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be GREATER than <{1}> but got <{2}> within {3}",
                             bucketName, minCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
@@ -531,7 +547,7 @@ public abstract class MinioAbstract {
             awaitCustom(providedAwait).untilAsserted(() ->
                     assertLessThanExpected(maxCount, getObjectsListArrayNoReportMethod(bucketName).size()));
         } catch (ConditionTimeoutException e) {
-            fail(
+            throw new AssertionError(
                     MessageFormat.format(
                             "Count objects from bucket <{0}> expected to be LESS than <{1}> but got <{2}> within {3}",
                             bucketName, maxCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
@@ -553,7 +569,7 @@ public abstract class MinioAbstract {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) > minSize);
         } catch (AssertionFailedError e) {
-            fail(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> but got <{3}>",
+            throw new AssertionError(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> but got <{3}>",
                     objectName, bucketName, formatBytes(minSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
     }
@@ -564,7 +580,7 @@ public abstract class MinioAbstract {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) < maxSize);
         } catch (AssertionFailedError e) {
-            fail(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> but got <{3}>",
+            throw new AssertionError(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> but got <{3}>",
                     objectName, bucketName, formatBytes(maxSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
     }

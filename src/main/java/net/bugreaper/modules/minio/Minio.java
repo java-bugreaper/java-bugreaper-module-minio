@@ -32,11 +32,6 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     private static Minio instance;
 
     /**
-     * default ms await in tests
-     */
-    private int awaitMs = 2000;
-
-    /**
      * specific ms await in specific assert (configure with {@link #withAwaitMs(int)})
      */
     private final ThreadLocal<Integer> specificAwaitMs = ThreadLocal.withInitial(() -> 0);
@@ -60,6 +55,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
      * This implementation is thread-safe using method-level synchronization.
      *
      * @return the singleton instance of {@link Minio}
+     * @see #Minio() config setup
      */
     public static synchronized Minio getInstance() {
         if (instance == null) {
@@ -77,20 +73,17 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
      * <p><b>Default file:</b> {@code bugreaper.yml}</p>
      * <p><b>Custom file:</b> using {@code -DbugreaperEnv=test} loads {@code bugreaper-test.yml}</p>
      *
-     * <p><b>Required configuration keys:</b></p>
-     * <ul>
-     *     <li>{@code modules.minio.url}</li>
-     *     <li>{@code modules.minio.port}</li>
-     *     <li>{@code modules.minio.username}</li>
-     *     <li>{@code modules.minio.password}</li>
-     * </ul>
-     *
-     * <p><b>Optional configuration keys:</b></p>
-     * <ul>
-     *     <li>{@code modules.minio.await}</li>
-     *     <li>{@code modules.minio.max-upload-file-size}</li>
-     *     <li>{@code modules.minio.max-download-file-size}</li>
-     * </ul>
+     * <pre>
+     * modules:
+     *   minio:
+     *     url: http://localhost
+     *     port: 29000
+     *     username: admin
+     *     password: password
+     *     await: 300 # optional
+     *     max-upload-file-size: 1024 # optional
+     *     max-download-file-size: 2048 # optional
+     * </pre>
      *
      * <p>Missing required keys will result in configuration errors.
      * Missing optional keys will fall back to predefined defaults.</p>
@@ -98,7 +91,6 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     public Minio() {
         loadFromYaml();
         createConnect(this.url, this.port, this.username, this.password);
-
     }
 
     private void loadFromYaml() {

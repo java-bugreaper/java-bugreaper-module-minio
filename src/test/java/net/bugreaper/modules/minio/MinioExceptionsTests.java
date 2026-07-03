@@ -7,6 +7,7 @@ import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioSetup;
 
 import java.text.MessageFormat;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
+@Isolated
 class MinioExceptionsTests {
 
     private final Minio minio = MinioSetup.getInstance().getMinio();

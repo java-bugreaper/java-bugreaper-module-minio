@@ -4,12 +4,14 @@ package net.bugreaper.modules.minio;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioSetup;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SuppressWarnings("squid:S2699")
+@Isolated
 class MinioConfigureValidationTests {
 
     @Test

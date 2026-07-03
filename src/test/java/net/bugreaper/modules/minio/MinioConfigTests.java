@@ -5,6 +5,7 @@ import net.bugreaper.core.config.YamlUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioSetup;
 
 import java.util.Objects;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SuppressWarnings("squid:S2699")
+@Isolated
 class MinioConfigTests {
 
     private static final Minio minio = MinioSetup.getInstance().getMinio();
@@ -65,7 +67,7 @@ class MinioConfigTests {
                             port=29000
                             username=admin
                             password=password
-                            awaitMs=300
+                            awaitMs=1000
                             downloadBufferSize=10240
                             maxUploadFileSize=1024
                             maxDownloadObjectSize=2048

@@ -9,6 +9,7 @@ import net.bugreaper.core.utils.LogWatcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioSetup;
 
 import static net.bugreaper.core.filereaders.ResourcesFileReader.*;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SuppressWarnings("squid:S2699")
+@Isolated
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MinioBaseTests {
 

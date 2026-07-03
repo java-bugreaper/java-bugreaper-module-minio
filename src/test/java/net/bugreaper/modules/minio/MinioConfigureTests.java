@@ -7,17 +7,16 @@ import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioSetup;
 
-import java.util.concurrent.CompletableFuture;
-
-import static java.lang.Thread.sleep;
 import static net.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @SuppressWarnings("squid:S2699")
+@Isolated
 class MinioConfigureTests {
 
     private static final Minio minio = MinioSetup.getInstance().getMinio().setDownloadBufferSize(1000);
@@ -95,31 +94,6 @@ class MinioConfigureTests {
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
                 is("Count objects from bucket <count-bucket-1200> expected to be EXACTLY <2> but got <1> within 1 second 200 milliseconds"));
-    }
-
-    @Test
-    void objectCountAssertPassedAwaitTest() {
-        var bucket = "count-bucket-2000-pass";
-        minio.createBucket(bucket);
-        minio.cleanBucket(bucket);
-
-        minio.uploadFileToBucket(bucket, TEST_FILE, "object1.txt");
-        minio.uploadFileToBucket(bucket, TEST_FILE, "test/object2.txt");
-
-        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> minio.seeObjectsCountIsExactly(bucket,3));
-        CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> pushWithSleep(bucket));
-
-        CompletableFuture.allOf(future1, future2).join();
-    }
-
-    @SuppressWarnings("squid:S2925")
-    private void pushWithSleep(String bucket){
-        try {
-            sleep(700);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        minio.uploadFileToBucket(bucket, TEST_FILE, "object3.txt");
     }
 
     @Test

@@ -3,6 +3,7 @@ package net.bugreaper.modules.minio;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioSetup;
 
 
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SuppressWarnings("java:S5778")
+@Isolated
 class MinioAssertsCatchTests {
 
     private final Minio minio = MinioSetup.getInstance().getMinio();
