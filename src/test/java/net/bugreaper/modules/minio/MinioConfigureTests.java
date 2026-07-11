@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
-import testcontainers.MinioSetup;
+import testcontainers.MinioContainerSetup;
 
 import static net.bugreaper.core.filereaders.ResourcesFileReader.createResourceFileWithSize;
 import static org.hamcrest.Matchers.is;
@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("squid:S2699")
 @Isolated
-class MinioConfigureTests {
+class MinioConfigureTests extends MinioContainerSetup {
 
-    private static final Minio minio = MinioSetup.getInstance().getMinio().setDownloadBufferSize(1000);
+    private static final Minio minio = getMinio().setDownloadBufferSize(1000);
 
 
-    private static final Minio minioDownload = MinioSetup.getInstance().getMinio()
+    private static final Minio minioDownload = getMinio()
             .setMaxDownloadObjectSize(10);
 
     private static final String DEFAULT_BUCKET = "bucket-configured";
@@ -60,7 +60,7 @@ class MinioConfigureTests {
 
     @Test
     void objectCountAssertFailedCustomAwaitTest() {
-        final Minio minioAwait = MinioSetup.getInstance().getMinio().setAwaitMs(200);
+        final Minio minioAwait = getMinio().setAwaitMs(200);
 
         var bucket = "count-bucket-200";
         minioAwait.createBucket(bucket);
@@ -79,7 +79,7 @@ class MinioConfigureTests {
 
     @Test
     void objectCountAssertFailedCustomAwait2Test() {
-        final Minio minioAwait = MinioSetup.getInstance().getMinio().setAwaitMs(1200);
+        final Minio minioAwait = getMinio().setAwaitMs(1200);
 
         var bucket = "count-bucket-1200";
         minioAwait.createBucket(bucket);
@@ -99,7 +99,7 @@ class MinioConfigureTests {
     @Test
     void maxUploadTest() {
 
-        final Minio minioUpload = MinioSetup.getInstance().getMinio().setMaxUploadSize(30);
+        final Minio minioUpload = getMinio().setMaxUploadSize(30);
 
         var bucket = "count-upload";
         minioUpload.createBucket(bucket);

@@ -302,7 +302,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
 
     @Override
     @Step("(Minio) Get object by shared link")
-    public String getObjectsBySharedLink(String urlLink) {
+    public String getObjectBySharedLink(String urlLink) {
         return getObjectsBySharedLinkMethod(urlLink);
     }
 
@@ -352,13 +352,13 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has great then {minCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has greater than {minCount} objects")
     public void seeObjectsCountIsGreaterThan(String bucketName, int minCount) {
         seeObjectsCountIsGreaterThanMethod(bucketName, minCount, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less then {maxCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less than {maxCount} objects")
     public void seeObjectsCountIsLessThan(String bucketName, int maxCount) {
         seeObjectsCountIsLessThanMethod(bucketName, maxCount, await());
     }

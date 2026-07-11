@@ -1,0 +1,21 @@
+========================================================================
+THIRD-PARTY NOTICES AND LICENSES
+========================================================================
+
+This project is licensed under the Apache License, Version 2.0.
+The core project code is independent, but it relies on third-party
+libraries listed below. Each library retains its original copyright
+and is distributed under its own license terms.
+
+------------------------------------------------------------------------
+Apache License, Version 2.0 Dependencies
+------------------------------------------------------------------------
+The following components are licensed under the Apache License, Version 2.0.
+A copy of this license is available in the primary LICENSE file of this
+project or at https://apache.org
+
+* net.bugreaper : core
+  Copyright (c) 2025-present [Oleksii Betin]. All rights reserved.
+
+* io.minio : minio
+  Copyright (c) MinIO, Inc. All rights reserved.

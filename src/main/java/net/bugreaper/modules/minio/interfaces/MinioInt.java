@@ -12,7 +12,8 @@ import net.bugreaper.core.assertable.AssertableStringList;
 public interface MinioInt {
 
     /**
-     * Assert number of objects in bucket exactly as expected (with await)
+     * Assert number of objects in bucket exactly as expected
+     * <p><b>with await</b>
      *
      * @param bucketName    bucket name
      * @param expectedCount expected count
@@ -22,7 +23,8 @@ public interface MinioInt {
     void seeObjectsCountIsExactly(String bucketName, int expectedCount);
 
     /**
-     * Assert number of objects in bucket greater than minSize (with await)
+     * Assert number of objects in bucket greater than minSize
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
      * @param minCount   minimum count
@@ -32,10 +34,11 @@ public interface MinioInt {
     void seeObjectsCountIsGreaterThan(String bucketName, int minCount);
 
     /**
-     * Assert number of objects in bucket less than maxCount (with await)
+     * Assert number of objects in bucket less than maxCount
+     * <p><b>with await</b>
      *
      * @param bucketName bucket name
-     * @param maxCount   expected count
+     * @param maxCount   maximum count
      * @throws AssertionError       on assert fail
      * @throws MinioHelperException on other Minio errors
      */
@@ -146,7 +149,7 @@ public interface MinioInt {
      * @param urlLink the URL of the shared file to download
      * @return String with data from object
      */
-    String getObjectsBySharedLink(String urlLink);
+    String getObjectBySharedLink(String urlLink);
 
     /**
      * Return object size in bytes

@@ -8,36 +8,23 @@ import org.testcontainers.containers.MinIOContainer;
 
 import java.util.Objects;
 
-public class MinioSetup {
+public class MinioContainerSetup {
 
 
-    MinIOContainer container = new MinIOContainer("minio/minio:RELEASE.2025-09-07T16-13-09Z")
+    static MinIOContainer container = new MinIOContainer("minio/minio:RELEASE.2025-09-07T16-13-09Z")
             .withExposedPorts(9000)
-            .withCreateContainerCmdModifier(cmd -> {
-                Objects.requireNonNull(cmd.getHostConfig()).withPortBindings(
-                        new PortBinding(Ports.Binding.bindPort(29000), new ExposedPort(9000))
-                );
-            })
+            .withCreateContainerCmdModifier(cmd -> Objects.requireNonNull(cmd.getHostConfig()).withPortBindings(
+                    new PortBinding(Ports.Binding.bindPort(29000), new ExposedPort(9000))
+            ))
             .withUserName("admin")
             .withPassword("password");
 
 
-    private static MinioSetup instance;
-
-
-    public MinioSetup() {
+    static {
         container.start();
     }
 
-    public static MinioSetup getInstance() {
-        if (instance == null) {
-            instance = new MinioSetup();
-        }
-
-        return instance;
-    }
-
-    public Minio getMinio() {
+    public static Minio getMinio() {
         return new Minio(
                 "http://" + container.getHost(),
                 container.getMappedPort(9000),

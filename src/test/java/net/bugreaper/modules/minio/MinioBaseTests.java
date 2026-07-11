@@ -10,7 +10,7 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Isolated;
-import testcontainers.MinioSetup;
+import testcontainers.MinioContainerSetup;
 
 import static net.bugreaper.core.filereaders.ResourcesFileReader.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SuppressWarnings("squid:S2699")
 @Isolated
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class MinioBaseTests {
+class MinioBaseTests extends MinioContainerSetup {
 
-    private static final Minio minio = MinioSetup.getInstance().getMinio();
+    private static final Minio minio = getMinio();
 
     private static final String DEFAULT_BUCKET = "new-bucket";
     private static final String TEST_FILE = "data/test_file_1.txt";
@@ -227,11 +227,11 @@ class MinioBaseTests {
 
         AllureAssert.assertThat(result)
                 .hasStep("(Minio) Upload file: data/test_file_1.txt to bucket: <new-bucket> like object: <object1.txt>")
-                .hasStep("(Assert) List should have count EQUAL to: <2>")
+                .hasStep("↑(Assert) List should have count EQUAL to: <2>")
                 .hasStep("(Minio) Share object: <object1.txt> from bucket: <new-bucket>")
                 .hasAttachment("object1.txt shared link:")
-                .hasStep("(Assert) List should have STRING EQUAL to: <object1.txt>")
-                .hasStep("(Assert) List should have STRING CONTAINS: <test/object2.txt>");
+                .hasStep("↑(Assert) List should have STRING EQUAL to: <object1.txt>")
+                .hasStep("↑(Assert) List should have STRING CONTAINS: <test/object2.txt>");
     }
 
     @Test
@@ -347,7 +347,7 @@ class MinioBaseTests {
         String url = minio.shareObjectInBucket(DEFAULT_BUCKET, object);
 
         //read file check
-        String content = minio.getObjectsBySharedLink(url);
+        String content = minio.getObjectBySharedLink(url);
         assertEquals(readResourceFile(TEST_FILE), content);
 
 

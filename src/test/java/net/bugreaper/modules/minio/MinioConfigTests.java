@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
-import testcontainers.MinioSetup;
+import testcontainers.MinioContainerSetup;
 
 import java.util.Objects;
 
@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("squid:S2699")
 @Isolated
-class MinioConfigTests {
+class MinioConfigTests extends MinioContainerSetup {
 
-    private static final Minio minio = MinioSetup.getInstance().getMinio();
+    private static final Minio minio = getMinio();
 
     private static final String DEFAULT_BUCKET = "new-bucket";
     private static final String TEST_FILE = "data/test_file_1.txt";
