@@ -5,19 +5,19 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
-import testcontainers.MinioSetup;
+import testcontainers.MinioContainerSetup;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SuppressWarnings("squid:S2699")
 @Isolated
-class MinioConfigureValidationTests {
+class MinioConfigureValidationTests extends MinioContainerSetup {
 
     @Test
     void configMinusAwaitTest() {
 
-        Minio test = MinioSetup.getInstance().getMinio();
+        Minio test = getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 test.setAwaitMs(-1));
@@ -30,7 +30,7 @@ class MinioConfigureValidationTests {
     @Test
     void configMinusDownloadBufferTest() {
 
-        Minio test = MinioSetup.getInstance().getMinio();
+        Minio test = getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 test.setDownloadBufferSize(-1));
@@ -43,7 +43,7 @@ class MinioConfigureValidationTests {
     @Test
     void configMinusUploadSizeTest() {
 
-        Minio test = MinioSetup.getInstance().getMinio();
+        Minio test = getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 test.setMaxUploadSize(-1));
@@ -56,7 +56,7 @@ class MinioConfigureValidationTests {
     @Test
     void configMinusMaxDownloadObjectSizeTest() {
 
-        Minio test = MinioSetup.getInstance().getMinio();
+        Minio test = getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 test.setMaxDownloadObjectSize(-1));
@@ -70,7 +70,7 @@ class MinioConfigureValidationTests {
     @Test
     void configLowWitAwaitTest() {
 
-        Minio test = MinioSetup.getInstance().getMinio();
+        Minio test = getMinio();
 
         Throwable exception = assertThrows(IllegalArgumentException.class, () ->
                 test.withAwaitMs(199));

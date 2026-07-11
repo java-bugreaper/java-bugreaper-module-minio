@@ -10,7 +10,6 @@ import net.bugreaper.core.assertable.AssertableStringList;
 import net.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.awaitility.core.ConditionTimeoutException;
 import org.junit.jupiter.api.Assertions;
-import org.opentest4j.AssertionFailedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +35,7 @@ import static net.bugreaper.core.url.BaseUrl.downloadFile;
 import static net.bugreaper.core.url.BaseUrl.readBody;
 import static net.bugreaper.core.utils.AwaitUtils.awaitCustom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 
 @SuppressWarnings("squid:S5960")
@@ -451,7 +451,7 @@ public abstract class MinioAbstract {
 
         try {
             awaitCustom(providedAwait).untilAsserted(() ->
-                    assertGreaterThanExpected(0, getObjectsCountInBucketMethod(bucketName)));
+                    assertNotEquals(0, getObjectsCountInBucketMethod(bucketName)));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
                     MessageFormat.format(
@@ -568,7 +568,7 @@ public abstract class MinioAbstract {
         try {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) > minSize);
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             throw new AssertionError(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> but got <{3}>",
                     objectName, bucketName, formatBytes(minSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
@@ -579,7 +579,7 @@ public abstract class MinioAbstract {
         try {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) < maxSize);
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             throw new AssertionError(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> but got <{3}>",
                     objectName, bucketName, formatBytes(maxSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }

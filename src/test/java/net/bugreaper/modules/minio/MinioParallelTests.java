@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import testcontainers.MinioSetup;
+import testcontainers.MinioContainerSetup;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -15,9 +15,9 @@ import static java.lang.Thread.sleep;
 
 @SuppressWarnings("squid:S2699")
 @Execution(ExecutionMode.CONCURRENT)
-class MinioParallelTests {
+class MinioParallelTests extends MinioContainerSetup {
 
-    private static final Minio minio = MinioSetup.getInstance().getMinio().setDownloadBufferSize(1000);
+    private static final Minio minio = getMinio().setDownloadBufferSize(1000);
 
     Minio minioConf = Minio.getInstance();
 

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
-import testcontainers.MinioSetup;
+import testcontainers.MinioContainerSetup;
 
 import java.text.MessageFormat;
 
@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @Isolated
-class MinioExceptionsTests {
+class MinioExceptionsTests extends MinioContainerSetup {
 
-    private final Minio minio = MinioSetup.getInstance().getMinio();
+    private final Minio minio = getMinio();
 
     private static final String DEFAULT_BUCKET = "new-bucket-ex";
     private static final String TEST_FILE = "data/test_file_1.txt";
@@ -27,7 +27,7 @@ class MinioExceptionsTests {
 
     @BeforeAll
     static void createDefaultBucket() {
-        MinioSetup.getInstance().getMinio().createBucket(DEFAULT_BUCKET);
+        getMinio().createBucket(DEFAULT_BUCKET);
     }
 
     @BeforeEach
