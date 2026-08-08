@@ -48,9 +48,9 @@ repositories {
 }
 
 dependencies {
-    api 'net.bugreaper:core:1.4.1'
+    api 'net.bugreaper:core:1.4.3'
 
-    api 'io.minio:minio:8.5.17'
+    api 'io.minio:minio:8.6.0'
 
     implementation 'org.apiguardian:apiguardian-api:1.1.2'
 
@@ -67,7 +67,7 @@ test {
     testLogging {
         events("PASSED", "FAILED", "SKIPPED")
         exceptionFormat = "full"
-
+        showStandardStreams = true
     }
     finalizedBy jacocoTestReport
 }

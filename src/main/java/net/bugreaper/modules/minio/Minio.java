@@ -1,6 +1,7 @@
 package net.bugreaper.modules.minio;
 
 import io.qameta.allure.Step;
+import net.bugreaper.modules.minio.interfaces.MinioAsserts;
 import net.bugreaper.modules.minio.interfaces.MinioConfig;
 import net.bugreaper.modules.minio.interfaces.MinioInt;
 import net.bugreaper.core.assertable.AssertableStringList;
@@ -11,21 +12,28 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Class consists methods that operate with Minio
+ * Minio helper that provides a common API for operating with Minio
  *
- * <p>For one instance run recommended: {@code Minio minio = Minio.getInstance();}</p>
+ * <p>It is recommended to use a single instance:
+ * {@code Minio minio = Minio.getInstance();}
+ * </p>
  *
  *
- * <p> Await for some asserts default: {@link Minio#awaitMs}, can be changed by: {@link Minio#setAwaitMs(int)}
- * <p> Buffer for file download default: {@link Minio#downloadBufferSize}, can be changed by: {@link Minio#setDownloadBufferSize(int)}
- * <p> Max read/download object size default: {@link Minio#maxDownloadObjectSize}, can be changed by: {@link Minio#setMaxDownloadObjectSize(int)}
- * <p> Max upload file size default: {@link Minio#maxUploadFileSize}, can be changed by: {@link Minio#setMaxUploadSize(int)}
+ * <p>Assertions use the default await timeout.
+ * The timeout can be changed using {@link #setAwaitMs(int)} or configuration:
+ * {@code modules.minio.await}.</p>
+ *
+ * <p>Maximum object read/download size defaults to {@link #maxDownloadObjectSize}
+ * and can be changed using {@link #setMaxDownloadObjectSize(int)}.</p>
+ *
+ * <p>Maximum file upload size defaults to {@link #maxUploadFileSize}
+ * and can be changed using {@link #setMaxUploadSize(int)}.</p>
  *
  * @author Oleksii Betin "ambu550"
  * @since 1.0.0
  */
 @SuppressWarnings("squid:S5960")
-public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
+public class Minio extends MinioAbstract implements MinioInt, MinioConfig, MinioAsserts {
 
     private static final Logger logger = LoggerFactory.getLogger("bugreaper-module-minio");
 
@@ -38,12 +46,12 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
 
 
     /**
-     * This constructor initializes client for interaction with Minio
+     * Creates a Minio helper with the specified connection settings.
      *
-     * @param url      host of Minio {@code  "http://your-minio-host"}
-     * @param port     port of Minio
-     * @param username admin username
-     * @param password admin password
+     * @param url      Minio url {@code  "http://your-minio-host"}
+     * @param port     Minio port
+     * @param username Minio username
+     * @param password Minio password
      */
     public Minio(String url, int port, String username, String password) {
         super(url, port, username, password);
@@ -54,8 +62,10 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
      * <p>
      * This implementation is thread-safe using method-level synchronization.
      *
-     * @return the singleton instance of {@link Minio}
+     * @return the shared instance of {@link Minio}
      * @see #Minio() config setup
+     *
+     * @throws IllegalArgumentException if the configuration contains invalid values
      */
     public static synchronized Minio getInstance() {
         if (instance == null) {
@@ -81,12 +91,14 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
      *     username: admin
      *     password: password
      *     await: 300 # optional
-     *     max-upload-file-size: 1024 # optional
-     *     max-download-file-size: 2048 # optional
+     *     max-upload-file-size: 1024 # (optional)
+     *     max-download-file-size: 2048 # (optional)
      * </pre>
      *
      * <p>Missing required keys will result in configuration errors.
      * Missing optional keys will fall back to predefined defaults.</p>
+     *
+     * @throws IllegalArgumentException if the configuration contains invalid values
      */
     public Minio() {
         loadFromYaml();
@@ -188,25 +200,25 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     // Upload
 
     @Override
-    @Step("(Minio) Upload file: {filePathName} to bucket: <{bucketName}>")
+    @Step("(Minio) Upload file: '{filePathName}' to bucket '{bucketName}'")
     public void uploadFileToBucket(String bucketName, String filePathName) {
         uploadFileToBucketMethod(bucketName, filePathName);
     }
 
     @Override
-    @Step("(Minio) Upload file: {filePathName} to bucket: <{bucketName}> like object: <{objectName}>")
+    @Step("(Minio) Upload file: '{filePathName}' to bucket '{bucketName}' as object '{objectName}'")
     public void uploadFileToBucket(String bucketName, String filePathName, String objectName) {
         uploadFileToBucketMethod(bucketName, filePathName, objectName, "text/plain");
     }
 
     @Override
-    @Step("(Minio) Upload file: <{filePathName}> to object: <{objectName}> in bucket: <{bucketName}>")
+    @Step("(Minio) Upload file: '{filePathName}' to bucket '{bucketName}' as object '{objectName}' with content type '{contentType}'")
     public void uploadFileToBucket(String bucketName, String filePathName, String objectName, String contentType) {
         uploadFileToBucketMethod(bucketName, filePathName, objectName, contentType);
     }
 
     @Override
-    @Step("(Minio) Share object: <{objectName}> from bucket: <{bucketName}>")
+    @Step("(Minio) Share object: '{objectName}' in bucket '{bucketName}'")
     public String shareObjectInBucket(String bucketName, String objectName) {
        return shareObjectInBucketMethod(bucketName,objectName);
     }
@@ -220,14 +232,14 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio) Download object: <{objectName}> from bucket: <{bucketName}> to file: <{filePathName}>")
+    @Step("(Minio) Download object: '{objectName}' in bucket: '{bucketName}' to file: '{filePathName}'")
     public void downloadObjectFromBucket(String bucketName, String objectName, String filePathName) {
         downloadObjectFromBucketMethod(bucketName, objectName, filePathName);
     }
 
     //bug new line in end!
     @Override
-    @Step("(Minio) Read object: <{objectName}> from bucket: <{bucketName}>")
+    @Step("(Minio) Read object: '{objectName}' in bucket: '{bucketName}'")
     public String readObjectFromBucket(String bucketName, String objectName) {
         return readObjectFromBucketMethod(bucketName, objectName);
     }
@@ -236,13 +248,13 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     // Create/Delete
 
     @Override
-    @Step("(Minio) Create bucket: <{bucketName}>")
+    @Step("(Minio) Create bucket: '{bucketName}'")
     public void createBucket(String bucketName) {
         createBucketMethod(bucketName);
     }
 
     @Override
-    @Step("(Minio) Delete empty bucket: <{bucketName}>")
+    @Step("(Minio) Delete empty bucket: '{bucketName}'")
     public void deleteEmptyBucket(String bucketName) {
 
         deleteEmptyBucketMethod(bucketName);
@@ -250,20 +262,20 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio) Delete bucket: <{bucketName}>")
+    @Step("(Minio) Delete bucket: '{bucketName}'")
     public void deleteFilledBucket(String bucketName) {
         cleanBucket(bucketName);
         deleteEmptyBucket(bucketName);
     }
 
     @Override
-    @Step("(Minio) Delete object: <{objectName}> from bucket: <{bucketName}>")
+    @Step("(Minio) Delete object: '{objectName}' in bucket: '{bucketName}'")
     public void deleteObjectFromBucket(String bucketName, String objectName) {
         deleteObjectFromBucketMethod(bucketName, objectName);
     }
 
     @Override
-    @Step("(Minio) Clean bucket: <{bucketName}>")
+    @Step("(Minio) Clean bucket: '{bucketName}'")
     public void cleanBucket(String bucketName) {
         cleanBucketMethod(bucketName);
     }
@@ -277,7 +289,7 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     }
 
     @Override
-    @Step("(Minio) Grab objects list from bucket: <{bucketName}>")
+    @Step("(Minio) Grab objects list in bucket: '{bucketName}'")
     public AssertableStringList getObjectsList(String bucketName) {
         return getObjectsListForAssertMethod(bucketName);
     }
@@ -310,74 +322,74 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig {
     // Asserts
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> is empty")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' is empty")
     public void seeBucketIsEmpty(String bucketName) {
         seeBucketIsEmptyMethod(bucketName, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> is not empty")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' is not empty")
     public void seeBucketIsNotEmpty(String bucketName) {
         seeBucketIsNotEmptyMethod(bucketName, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> exists")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' exists")
     public void seeBucketExists(String bucketName) {
         seeBucketExistsMethod(bucketName, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> does not exist")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' does not exist")
     public void seeBucketDoesNotExist(String bucketName) {
         seeBucketDoesNotExistMethod(bucketName, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> exists in bucket <{bucketName}>")
+    @Step("(Minio)[ASSERT] Object: '{objectName}' exists in bucket '{bucketName}'")
     public void seeObjectExists(String bucketName, String objectName) {
         seeObjectExistsMethod(bucketName, objectName, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> does not exist in bucket <{bucketName}>")
+    @Step("(Minio)[ASSERT] Object: '{objectName}' does not exist in bucket '{bucketName}'")
     public void seeObjectDoesNotExist(String bucketName, String objectName) {
         seeObjectDoesNotExistMethod(bucketName, objectName, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has exactly {expectedCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' has exactly <{expectedCount}> objects")
     public void seeObjectsCountIsExactly(String bucketName, int expectedCount) {
         seeObjectsCountIsExactlyMethod(bucketName, expectedCount, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has greater than {minCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' has greater than <{minCount}> objects")
     public void seeObjectsCountIsGreaterThan(String bucketName, int minCount) {
         seeObjectsCountIsGreaterThanMethod(bucketName, minCount, await());
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Bucket: <{bucketName}> has less than {maxCount} objects")
+    @Step("(Minio)[ASSERT] Bucket: '{bucketName}' has less than <{maxCount}> objects")
     public void seeObjectsCountIsLessThan(String bucketName, int maxCount) {
         seeObjectsCountIsLessThanMethod(bucketName, maxCount, await());
     }
 
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size exactly: {expectedSize} bytes")
+    @Step("(Minio)[ASSERT] Object: '{objectName}' in bucket '{bucketName}' size exactly <{expectedSize}> bytes")
     public void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize) {
         seeObjectSizeExactlyMethod(bucketName, objectName, expectedSize);
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size greater: {minSize} bytes")
+    @Step("(Minio)[ASSERT] Object: '{objectName}' in bucket '{bucketName}' size greater <{minSize}> bytes")
     public void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long minSize) {
         seeObjectSizeIsGreaterThanMethod(bucketName, objectName, minSize);
     }
 
     @Override
-    @Step("(Minio)[ASSERT] Object: <{objectName}> from bucket <{bucketName}> size less: {maxSize} bytes")
+    @Step("(Minio)[ASSERT] Object: '{objectName}' in bucket '{bucketName}' size less <{maxSize}> bytes")
     public void seeObjectSizeIsLessThan(String bucketName, String objectName, long maxSize) {
         seeObjectSizeIsLessThanMethod(bucketName, objectName, maxSize);
     }
