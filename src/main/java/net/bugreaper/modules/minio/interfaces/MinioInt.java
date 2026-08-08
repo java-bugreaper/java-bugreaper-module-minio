@@ -1,329 +1,229 @@
 package net.bugreaper.modules.minio.interfaces;
 
 import net.bugreaper.core.exceptions.BaseUrlException;
+import net.bugreaper.modules.filehelper.FileHelper;
 import net.bugreaper.modules.minio.exceptions.MinioHelperException;
 import net.bugreaper.core.assertable.AssertableStringList;
 
 
 /**
- * Interface defines methods for facilitating helper interactions and assertions.
+ * Interface defines methods for facilitating helper interactions.
  * Validates that all required methods are implemented.
  */
 public interface MinioInt {
 
-    /**
-     * Assert number of objects in bucket exactly as expected
-     * <p><b>with await</b>
-     *
-     * @param bucketName    bucket name
-     * @param expectedCount expected count
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectsCountIsExactly(String bucketName, int expectedCount);
 
     /**
-     * Assert number of objects in bucket greater than minSize
-     * <p><b>with await</b>
+     * Deletes all objects from the bucket.
      *
      * @param bucketName bucket name
-     * @param minCount   minimum count
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectsCountIsGreaterThan(String bucketName, int minCount);
-
-    /**
-     * Assert number of objects in bucket less than maxCount
-     * <p><b>with await</b>
-     *
-     * @param bucketName bucket name
-     * @param maxCount   maximum count
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectsCountIsLessThan(String bucketName, int maxCount);
-
-    /**
-     * Delete all objects in bucket
-     *
-     * @param bucketName bucket name
-     * @throws MinioHelperException if failed to clean
+     * @throws MinioHelperException if deleting the objects fails
      */
     void cleanBucket(String bucketName);
 
     /**
-     * Create bucket
-     * <p> No error if bucket already exists (is ignored, the objects remain)
+     * Creates a bucket.
+     *
+     * <p>No error is thrown if the bucket already exists; existing objects are preserved.</p>
      *
      * @param bucketName bucket name
-     * @throws MinioHelperException if failed to create
+     * @throws MinioHelperException if bucket creation fails
      */
     void createBucket(String bucketName);
 
     /**
-     * Delete bucket (must be empty)
+     * Deletes an empty bucket.
+     *
+     * <p>The bucket must be empty before deletion.</p>
      *
      * @param bucketName bucket name
-     * @throws MinioHelperException if bucket not empty or other error
+     * @throws MinioHelperException if the bucket is not empty or another error occurs
      */
     void deleteEmptyBucket(String bucketName);
 
     /**
-     * Delete bucket (empty or filled)
-     * <p>clean bucket before delete
+     * Deletes a bucket, whether empty or containing objects.
+     *
+     * <p>All objects are deleted before the bucket is removed.</p>
      *
      * @param bucketName bucket name
-     * @throws MinioHelperException on Minio errors
+     * @throws MinioHelperException if a MinIO error occurs
      */
     void deleteFilledBucket(String bucketName);
 
     /**
-     * Delete object in bucket
+     * Deletes an object from a bucket.
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @throws MinioHelperException on Minio errors
+     * @throws MinioHelperException if a MinIO error occurs
      */
     void deleteObjectFromBucket(String bucketName, String objectName);
 
     /**
-     * Downloads a file from the given URL and saves it to the specified local file path <b>in test resources</b>.
+     * Downloads a file from the specified URL and saves it to the given local file path
+     * in test resources.
      *
-     * <p><i>You can check this file with core features</i></p>
-     * <pre>
+     * <p><i>The downloaded file can be verified using {@link FileHelper} core features.</i></p>
+     *
+     * <pre>{@code
      * Minio minio = Minio.getInstance();
-     * FileHelper fileHelper = new FileHelper();
+     * FileHelper fh = FileHelper.getInstance();
      *
-     * minio.downloadObjectBySharedLink("http://...". "minio/my-file.txt");
-     * fileHelper.seeFileContainString("minio/my-file.txt", "Hello");
-     * </pre>
+     * minio.downloadObjectBySharedLink("http://...", "minio/my-file.txt");
+     * fh.seeFileContainString("minio/my-file.txt", "Hello");
+     * }</pre>
      *
-     * @param urlLink   the URL of the shared file to download
-     * @param filePath file path (including file name) in test-resources (example: "minio/my-file.txt")
-     * @throws BaseUrlException on download error
+     * @param urlLink  URL of the shared file to download
+     * @param filePath local file path, including the file name, relative to test resources
+     *                 (for example: {@code "minio/my-file.txt"})
+     * @throws BaseUrlException if the file download fails
      */
     void downloadObjectBySharedLink(String urlLink, String filePath);
 
     /**
-     * Download object to file in test resources
+     * Downloads an object from a bucket and saves it to a file in test resources.
      *
-     * <p><i>You can check this file with core features</i></p>
-     * <pre>
+     * <p><i>The downloaded file can be verified using {@link FileHelper} core features.</i></p>
+     *
+     * <pre>{@code
      * Minio minio = Minio.getInstance();
-     * FileHelper fileHelper = new FileHelper();
+     * FileHelper fh = FileHelper.getInstance();
      *
-     * minio.downloadObjectBySharedLink("...". "minio/my-file.txt");
-     * fileHelper.seeFileContainString("minio/my-file.txt", "Hello")
-     * </pre>
+     * minio.downloadObjectFromBucket("my-bucket", "my-file.txt", "minio/my-file.txt");
+     * fh.seeFileContainString("minio/my-file.txt", "Hello");
+     * }</pre>
+     *
      * @param bucketName   bucket name
      * @param objectName   object path/name
-     * @param filePathName file path (including file name) in test-resources (example: "minio/my-file.txt")
-     * @throws MinioHelperException on Minio errors
+     * @param filePathName local file path, including the file name, relative to test resources
+     *                     (for example: {@code "minio/my-file.txt"})
+     * @throws MinioHelperException if a MinIO error occurs
      */
     void downloadObjectFromBucket(String bucketName, String objectName, String filePathName);
 
     /**
-     * Return list of buckets
+     * Returns a list of bucket names.
      *
-     * @return {@link AssertableStringList}
-     * <p> EXAMPLE:
-     * <p>getBucketsList().seeListAnyEquals("bucket.txt")
-     * <p><b>can be provided multiple asserts with list</b>
-     * @throws MinioHelperException on Minio errors
+     * @return {@link AssertableStringList} containing bucket names
+     *
+     * <p>Example:
+     * <pre>{@code
+     * minio.getBucketsList()
+     *  .seeListHasExactlyCount(2)
+     *  .seeListAnyEquals("my-bucket");
+     * }</pre>
+     *
+     * <p>Multiple assertions can be performed on the returned list.
+     *
+     * @throws MinioHelperException if a MinIO error occurs
      */
     AssertableStringList getBucketsList();
 
     /**
-     * Return objects count in bucket
+     * Returns the number of objects in a bucket.
      *
      * @param bucketName bucket name
-     * @return int with objects count
-     * @throws MinioHelperException on Minio errors
+     * @return number of objects in the bucket
+     * @throws MinioHelperException if a MinIO error occurs
      */
     int getObjectsCountInBucket(String bucketName);
 
     /**
-     * Executes an HTTP GET request to the given URL and returns the response body as a string.
+     * Executes an HTTP GET request to the specified URL and returns the response body as a string.
      *
-     * @param urlLink the URL of the shared file to download
-     * @return String with data from object
+     * @param urlLink URL of the shared object
+     * @return response body as a string
+     * @throws BaseUrlException if the request fails
      */
     String getObjectBySharedLink(String urlLink);
 
     /**
-     * Return object size in bytes
+     * Returns the size of an object in bytes.
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @return long with object size
-     * @throws MinioHelperException on Minio errors
+     * @return object size in bytes
+     * @throws MinioHelperException if a MinIO error occurs
      */
     long getObjectSize(String bucketName, String objectName);
 
     /**
-     * Return list of objects(with path) from bucket
+     * Returns a list of object names, including their paths, from a bucket.
      *
      * @param bucketName bucket name
-     * @return {@link AssertableStringList}
-     * <p> EXAMPLE:
-     * <p>getObjectsList("my-bucket").seeListAnyEquals("object1.txt")
-     * <p><b>can be provided multiple asserts with list</b>
-     * @throws MinioHelperException on Minio errors
+     * @return {@link AssertableStringList} containing object names and paths
+     *
+     * <p>Example:
+     * <pre>{@code
+     * minio.getObjectsList("my-bucket")
+     *  .seeListHasExactlyCount(2)
+     *  .seeListAnyEquals("object1.txt");
+     * }</pre>
+     *
+     * <p>Multiple assertions can be performed on the returned list.
+     *
+     * @throws MinioHelperException if a MinIO error occurs
      */
     AssertableStringList getObjectsList(String bucketName);
 
     /**
-     * Return exists status of object
+     * Returns whether an object exists in a bucket.
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @return boolean true=exists, false=not exists
-     * @throws MinioHelperException on other Minio errors
+     * @return {@code true} if the object exists, {@code false} otherwise
+     * @throws MinioHelperException if a MinIO error occurs
      */
     boolean objectExistsStatus(String bucketName, String objectName);
 
     /**
-     * Read and return String with object data
+     * Reads an object from a bucket and returns its contents as a string.
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @return String with data
-     * @throws MinioHelperException on other Minio errors
+     * @return object contents as a string
+     * @throws MinioHelperException if a MinIO error occurs
      */
     String readObjectFromBucket(String bucketName, String objectName);
 
     /**
-     * Assert that bucket exists
-     * <p><b>with await</b>
-     *
-     * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeBucketExists(String bucketName);
-
-    /**
-     * Assert that bucket is empty
-     * <p><b>with await</b>
-     *
-     * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeBucketIsEmpty(String bucketName);
-
-    /**
-     * Assert that bucket is not empty
-     * <p><b>with await</b>
-     *
-     * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeBucketIsNotEmpty(String bucketName);
-
-    /**
-     * Assert that bucket does not exist
-     * <p><b>with await</b>
-     *
-     * @param bucketName bucket name
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeBucketDoesNotExist(String bucketName);
-
-    /**
-     * Assert that object exists in bucket
-     * <p><b>with await</b>
+     * Creates a shareable URL for an object that is valid for 12 hours.
      *
      * @param bucketName bucket name
      * @param objectName object path/name
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectExists(String bucketName, String objectName);
-
-    /**
-     * Assert that object does not exist (with await)
-     *
-     * @param bucketName bucket name
-     * @param objectName object path/name
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectDoesNotExist(String bucketName, String objectName);
-
-    /**
-     * Assert size of object in bucket exactly as expected
-     *
-     * @param bucketName   bucket name
-     * @param objectName   object path/name
-     * @param expectedSize expected size in bytes
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectSizeExactly(String bucketName, String objectName, long expectedSize);
-
-    /**
-     * Assert size of object in bucket greater than minSize
-     *
-     * @param bucketName bucket name
-     * @param objectName object path/name
-     * @param minSize    minimum size in bytes
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectSizeIsGreaterThan(String bucketName, String objectName, long minSize);
-
-    /**
-     * Assert size of objects in bucket less than maxSize
-     *
-     * @param bucketName bucket name
-     * @param objectName object path/name
-     * @param maxSize    maximum size in bytes
-     * @throws AssertionError       on assert fail
-     * @throws MinioHelperException on other Minio errors
-     */
-    void seeObjectSizeIsLessThan(String bucketName, String objectName, long maxSize);
-
-    /**
-     * Share (for 12 hours) object and return url
-     *
-     * @param bucketName bucket name
-     * @param objectName object path/name
-     * @return String with link for object download
-     * @throws MinioHelperException on other Minio errors
+     * @return URL for downloading the object
+     * @throws MinioHelperException if a MinIO error occurs
      */
     String shareObjectInBucket(String bucketName, String objectName);
 
     /**
-     * Upload object to bucket with same name as file
+     * Uploads a file to a bucket using the file name as the object name.
      *
      * @param bucketName bucket name
-     * @param filePath   path to file in test resources
-     * @throws MinioHelperException on Minio errors
+     * @param filePath   path to the file in test resources
+     * @throws MinioHelperException if a MinIO error occurs
      */
     void uploadFileToBucket(String bucketName, String filePath);
 
     /**
-     * Upload object to bucket with custom name
+     * Uploads a file to a bucket using a custom object name.
      *
      * @param bucketName bucket name
-     * @param filePath   path to file in test resources
-     * @param objectName provide object path/name
-     * @throws MinioHelperException on Minio errors
+     * @param filePath   path to the file in test resources
+     * @param objectName custom object path/name
+     * @throws MinioHelperException if a MinIO error occurs
      */
     void uploadFileToBucket(String bucketName, String filePath, String objectName);
 
     /**
-     * Upload object to bucket with custom name and type
+     * Uploads a file to a bucket using a custom object name and content type.
      *
      * @param bucketName  bucket name
-     * @param filePath    path to file in test resources
-     * @param objectName  provide object path/name
-     * @param contentType content type
-     * @throws MinioHelperException on Minio errors
+     * @param filePath    path to the file in test resources
+     * @param objectName  custom object path/name
+     * @param contentType object content type
+     * @throws MinioHelperException if a MinIO error occurs
      */
     void uploadFileToBucket(String bucketName, String filePath, String objectName, String contentType);
 

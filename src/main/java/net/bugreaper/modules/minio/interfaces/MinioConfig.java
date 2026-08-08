@@ -11,48 +11,50 @@ public interface MinioConfig {
 
 
     /**
-     * Configure download buffer size
+     * Sets the buffer size for file downloads.
      *
-     * @param downloadBufferSize buffer size for file upload
+     * @param downloadBufferSize buffer size in bytes
      * @return this instance for method chaining
-     * @throws IllegalArgumentException on invalid setup
+     * @throws IllegalArgumentException if the specified size is invalid
      */
     Minio setDownloadBufferSize(int downloadBufferSize);
 
     /**
-     * Sets the global await timeout (in milliseconds) used by all operations with await
+     * Configures the global await timeout for assertions.
      *
-     * @param awaitMs ms await
+     * @param awaitMs await timeout in milliseconds
      * @return this instance for method chaining
-     * @throws IllegalArgumentException on invalid setup
+     * @throws IllegalArgumentException if the provided timeout is invalid or less than 200 milliseconds
      */
     Minio setAwaitMs(int awaitMs);
 
     /**
-     * Configure await for next assert with await (than await rollback to global)
-     * global {@link #setAwaitMs(int)} will be ignored
+     * Sets a custom await timeout for the next assertion operation.
      *
-     * @param awaitMs ms await
+     * <p>After the operation is completed, the timeout is reset to the global value
+     * configured by {@link #setAwaitMs(int)}.</p>
+     *
+     * @param awaitMs await timeout in milliseconds
      * @return this instance for method chaining
-     * @throws IllegalArgumentException on invalid setup
+     * @throws IllegalArgumentException if the timeout is invalid
      */
     Minio withAwaitMs(int awaitMs);
 
     /**
-     * Configure max size for file to upload
+     * Sets the maximum size of a file that can be uploaded.
      *
-     * @param maxUploadSize max size in bytes for file to upload
+     * @param maxUploadSize maximum file size in bytes
      * @return this instance for method chaining
-     * @throws IllegalArgumentException on invalid setup
+     * @throws IllegalArgumentException if the specified size is invalid
      */
     Minio setMaxUploadSize(int maxUploadSize);
 
     /**
-     * Configure max size for file to download/read
+     * Sets the maximum size of an object that can be downloaded or read.
      *
-     * @param maxDownloadObjectSize max size in bytes for object to download/read
+     * @param maxDownloadObjectSize maximum object size in bytes
      * @return this instance for method chaining
-     * @throws IllegalArgumentException on invalid setup
+     * @throws IllegalArgumentException if the specified size is invalid
      */
     Minio setMaxDownloadObjectSize(int maxDownloadObjectSize);
 

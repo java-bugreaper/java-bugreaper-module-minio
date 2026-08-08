@@ -1,4 +1,4 @@
 include:
   - project: 'bug-reaper/gitlab-setup'
     ref: $CI_DEFAULT_BRANCH
-    file: '.gitlab-ci-gradle.yml'
+    file: '.gitlab-ci-gradle-enchanted.yml'

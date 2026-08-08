@@ -38,14 +38,14 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(200).seeBucketIsEmpty(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> expected to be empty but has 2 object/s within 200 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be empty, but got <2> objects within 200 milliseconds", bucket),
                 exception1.getMessage());
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketIsEmpty(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> expected to be empty but has 2 object/s within 300 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be empty, but got <2> objects within 300 milliseconds", bucket),
                 exception2.getMessage());
     }
 
@@ -60,14 +60,14 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(210).seeBucketIsNotEmpty(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> expected to be not empty but has no objects within 210 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be not empty, but got no objects within 210 milliseconds", bucket),
                 exception1.getMessage());
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketIsNotEmpty(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> expected to be not empty but has no objects within 300 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be not empty, but got no objects within 300 milliseconds", bucket),
                 exception2.getMessage());
     }
 
@@ -79,7 +79,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(220).seeBucketExists(bucketNotExists));
 
         assertEquals(
-                String.format("Bucket <%s> does not exist within 220 milliseconds", bucketNotExists),
+                String.format("Bucket '%s' does not exist within 220 milliseconds", bucketNotExists),
                 exception1.getMessage(),
                 "Error on check bucket exists fail");
 
@@ -87,7 +87,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.seeBucketExists(bucketNotExists));
 
         assertEquals(
-                String.format("Bucket <%s> does not exist within 300 milliseconds", bucketNotExists),
+                String.format("Bucket '%s' does not exist within 300 milliseconds", bucketNotExists),
                 exception2.getMessage(),
                 "Error on check bucket exists fail");
     }
@@ -102,7 +102,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(230).seeBucketDoesNotExist(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> unexpected exists within 230 milliseconds", bucket),
+                String.format("Bucket '%s' unexpectedly exists within 230 milliseconds", bucket),
                 exception1.getMessage(),
                 "Error on check bucket not exists fail");
 
@@ -110,7 +110,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.seeBucketDoesNotExist(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> unexpected exists within 300 milliseconds", bucket),
+                String.format("Bucket '%s' unexpectedly exists within 300 milliseconds", bucket),
                 exception2.getMessage(),
                 "Error on check bucket not exists fail");
     }
@@ -128,7 +128,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(210).seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> does not exist in bucket <%s> within 210 milliseconds", object, bucket),
+                String.format("Object '%s' does not exist in bucket '%s' within 210 milliseconds", object, bucket),
                 exception1.getMessage(),
                 "Error on check object exists fail");
 
@@ -136,7 +136,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> does not exist in bucket <%s> within 300 milliseconds", object, bucket),
+                String.format("Object '%s' does not exist in bucket '%s' within 300 milliseconds", object, bucket),
                 exception2.getMessage(),
                 "Error on check object exists fail");
     }
@@ -156,7 +156,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(350).seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> does not exist in bucket <%s> within 350 milliseconds", object, bucket),
+                String.format("Object '%s' does not exist in bucket '%s' within 350 milliseconds", object, bucket),
                 exception1.getMessage(),
                 "Error on check object exists fail");
 
@@ -164,7 +164,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> does not exist in bucket <%s> within 300 milliseconds", object, bucket),
+                String.format("Object '%s' does not exist in bucket '%s' within 300 milliseconds", object, bucket),
                 exception2.getMessage(),
                 "Error on check object exists fail");
     }
@@ -181,7 +181,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(400).seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> does not exist in bucket <%s> within 400 milliseconds", object, bucket),
+                String.format("Object '%s' does not exist in bucket '%s' within 400 milliseconds", object, bucket),
                 exception.getMessage(),
                 "await from specific global");
 
@@ -190,7 +190,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.seeObjectExists(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> does not exist in bucket <%s> within 300 milliseconds", object, bucket),
+                String.format("Object '%s' does not exist in bucket '%s' within 300 milliseconds", object, bucket),
                 exception2.getMessage(),
                 "await rollback to global");
     }
@@ -208,7 +208,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
 
 
         assertEquals(
-                String.format("Object <%s> exists in bucket <%s> within 200 milliseconds", object, bucket),
+                String.format("Object '%s' exists in bucket '%s' within 200 milliseconds", object, bucket),
                 exception1.getMessage(),
                 "Error on check object not exists fail");
 
@@ -216,7 +216,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.seeObjectDoesNotExist(bucket, object));
 
         assertEquals(
-                String.format("Object <%s> exists in bucket <%s> within 300 milliseconds", object, bucket),
+                String.format("Object '%s' exists in bucket '%s' within 300 milliseconds", object, bucket),
                 exception2.getMessage(),
                 "Error on check object not exists fail");
     }
@@ -236,7 +236,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception1.getMessage(),
-                is("Count objects from bucket <count-bucket> expected to be EXACTLY <3> but got <2> within 200 milliseconds"));
+                is("Expected EXACTLY <3> objects in bucket 'count-bucket', but got <2> within 200 milliseconds"));
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsExactly(bucket,3));
@@ -244,7 +244,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception2.getMessage(),
-                is("Count objects from bucket <count-bucket> expected to be EXACTLY <3> but got <2> within 2 seconds"));
+                is("Expected EXACTLY <3> objects in bucket 'count-bucket', but got <2> within 2 seconds"));
     }
 
     @Test
@@ -260,17 +260,15 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minio.withAwaitMs(200).seeObjectsCountIsLessThan(bucket, 2));
 
         MatcherAssert.assertThat(
-                "Error on assert objects count greater in bucket",
                 exception1.getMessage(),
-                is("Count objects from bucket <bucket-less> expected to be LESS than <2> but got <2> within 200 milliseconds"));
+                is("Expected the number of objects in bucket 'bucket-less' to be LESS than <2>, but got <2> within 200 milliseconds"));
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsLessThan(bucket, 1));
 
         MatcherAssert.assertThat(
-                "Error on assert objects count greater in bucket",
                 exception2.getMessage(),
-                is("Count objects from bucket <bucket-less> expected to be LESS than <1> but got <2> within 2 seconds"));
+                is("Expected the number of objects in bucket 'bucket-less' to be LESS than <1>, but got <2> within 2 seconds"));
     }
 
     @Test
@@ -288,7 +286,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count greater in bucket",
                 exception1.getMessage(),
-                is("Count objects from bucket <bucket-greater> expected to be GREATER than <3> but got <2> within 200 milliseconds"));
+                is("Expected the number of objects in bucket 'bucket-greater' to be GREATER than <3>, but got <2> within 200 milliseconds"));
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minio.seeObjectsCountIsGreaterThan(bucket, 2));
@@ -296,7 +294,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count greater in bucket",
                 exception2.getMessage(),
-                is("Count objects from bucket <bucket-greater> expected to be GREATER than <2> but got <2> within 2 seconds"));
+                is("Expected the number of objects in bucket 'bucket-greater' to be GREATER than <2>, but got <2> within 2 seconds"));
     }
 
     @Test
@@ -317,7 +315,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exception.getMessage(),
-                StringContains.containsString("Object <object_size.txt> size from bucket <bucket-test> expected to be equal <179 bytes> but got <180 bytes>"));
+                StringContains.containsString("Object 'object_size.txt' size in bucket 'bucket-test' expected to be EXACTLY <179 bytes>, but got <180 bytes>"));
 
         Throwable exceptionLess = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, expectedBytes ));
@@ -325,7 +323,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionLess.getMessage(),
-                is("Object <object_size.txt> size from bucket <bucket-test> expected to be less <180 bytes> but got <180 bytes>"));
+                is("Object 'object_size.txt' size in bucket 'bucket-test' expected to be LESS <180 bytes>, but got <180 bytes>"));
 
         Throwable exceptionGreater = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, 1024 ));
@@ -333,7 +331,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionGreater.getMessage(),
-                is("Object <object_size.txt> size from bucket <bucket-test> expected to be greater <1Kb> but got <180 bytes>"));
+                is("Object 'object_size.txt' size in bucket 'bucket-test' expected to be GREATER <1Kb>, but got <180 bytes>"));
     }
 
     @Test
@@ -354,7 +352,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exception.getMessage(),
-                StringContains.containsString("Object <object_size2.txt> size from bucket <bucket-test> expected to be equal <181 bytes> but got <180 bytes>"));
+                StringContains.containsString("Object 'object_size2.txt' size in bucket 'bucket-test' expected to be EXACTLY <181 bytes>, but got <180 bytes>"));
 
         Throwable exceptionLess = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsLessThan(TEST_BUCKET, object, 121 ));
@@ -362,7 +360,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionLess.getMessage(),
-                is("Object <object_size2.txt> size from bucket <bucket-test> expected to be less <121 bytes> but got <180 bytes>"));
+                is("Object 'object_size2.txt' size in bucket 'bucket-test' expected to be LESS <121 bytes>, but got <180 bytes>"));
 
         Throwable exceptionGreater = assertThrows(AssertionError.class, () ->
                 minio.seeObjectSizeIsGreaterThan(TEST_BUCKET, object, 1024*1024+1 ));
@@ -370,7 +368,7 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects size",
                 exceptionGreater.getMessage(),
-                is("Object <object_size2.txt> size from bucket <bucket-test> expected to be greater <1Mb 1 byte> but got <180 bytes>"));
+                is("Object 'object_size2.txt' size in bucket 'bucket-test' expected to be GREATER <1Mb 1 byte>, but got <180 bytes>"));
     }
 
 }

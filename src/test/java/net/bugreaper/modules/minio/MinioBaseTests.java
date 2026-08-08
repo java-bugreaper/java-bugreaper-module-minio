@@ -28,20 +28,17 @@ class MinioBaseTests extends MinioContainerSetup {
     private static final String TEST_FILE_LINES = "data/test_file_with_lines.txt";
     private static final String TEST_FILE_LINES2 = "data/test_file_with_lines2.txt";
 
+    private LogWatcher logWatcher;
 
     @BeforeAll
     static void createDefaultBucket() {
         minio.createBucket(DEFAULT_BUCKET);
+        AllureResultLoader.cleanResultsDir();
     }
 
     @BeforeEach
-    void cleanBucket() {
+    void clean() {
         minio.cleanBucket(DEFAULT_BUCKET);
-    }
-
-    private LogWatcher logWatcher;
-    @BeforeEach
-    void setup() {
         logWatcher = new LogWatcher("bugreaper-module-minio", Level.DEBUG);
     }
 
@@ -62,7 +59,7 @@ class MinioBaseTests extends MinioContainerSetup {
 
         MatcherAssert.assertThat(
                 logWatcher.getLoggedEvents(Level.INFO).toString(),
-                StringContains.containsString(String.format("Bucket <%s> already exist", bucket)));
+                StringContains.containsString(String.format("Bucket '%s' already exists", bucket)));
     }
 
     @Test
@@ -81,9 +78,9 @@ class MinioBaseTests extends MinioContainerSetup {
         minio.deleteObjectFromBucket(DEFAULT_BUCKET, obj);
         minio.seeObjectDoesNotExist(DEFAULT_BUCKET, obj);
 
-        MatcherAssert.assertThat(
-                logWatcher.getLoggedEvents(Level.INFO).toString(),
-                StringContains.containsString(String.format("Object <%s> in <%s> successfully deleted", obj, DEFAULT_BUCKET)));
+        assertEquals(
+                String.format("[[INFO] Object '%s' successfully deleted from bucket '%s']", obj, DEFAULT_BUCKET),
+                logWatcher.getLoggedEvents(Level.INFO).toString());
     }
 
     @Test
@@ -226,9 +223,9 @@ class MinioBaseTests extends MinioContainerSetup {
         JsonNode result = AllureResultLoader.loadByTestName("getObjectsListTest");
 
         AllureAssert.assertThat(result)
-                .hasStep("(Minio) Upload file: data/test_file_1.txt to bucket: <new-bucket> like object: <object1.txt>")
+                .hasStep("(Minio) Upload file: 'data/test_file_1.txt' to bucket 'new-bucket' as object 'object1.txt'")
                 .hasStep("↑(Assert) List should have count EQUAL to: <2>")
-                .hasStep("(Minio) Share object: <object1.txt> from bucket: <new-bucket>")
+                .hasStep("(Minio) Share object: 'object1.txt' in bucket 'new-bucket'")
                 .hasAttachment("object1.txt shared link:")
                 .hasStep("↑(Assert) List should have STRING EQUAL to: <object1.txt>")
                 .hasStep("↑(Assert) List should have STRING CONTAINS: <test/object2.txt>");
@@ -300,14 +297,15 @@ class MinioBaseTests extends MinioContainerSetup {
 
         MatcherAssert.assertThat(
                 logs,
-                StringContains.containsString(String.format("Bucket <%s> successfully created", bucket)));
-        MatcherAssert.assertThat(
-                logs,
-                StringContains.containsString(String.format("Objects(1) in <%s> successfully deleted", bucket)));
+                StringContains.containsString(String.format("Bucket '%s' successfully created", bucket)));
 
         MatcherAssert.assertThat(
                 logs,
-                StringContains.containsString(String.format("Bucket <%s> successfully deleted", bucket)));
+                StringContains.containsString(String.format("Successfully deleted 1 objects from bucket '%s'", bucket)));
+
+        MatcherAssert.assertThat(
+                logs,
+                StringContains.containsString(String.format("Bucket '%s' successfully deleted", bucket)));
     }
 
     @Test

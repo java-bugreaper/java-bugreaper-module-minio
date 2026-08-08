@@ -3,7 +3,6 @@ package net.bugreaper.modules.minio;
 
 import net.bugreaper.modules.minio.exceptions.MinioHelperException;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.StringContains;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +54,7 @@ class MinioConfigureTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                is("Count objects from bucket <count-bucket-2000> expected to be EXACTLY <3> but got <2> within 2 seconds"));
+                is("Expected EXACTLY <3> objects in bucket 'count-bucket-2000', but got <2> within 2 seconds"));
     }
 
     @Test
@@ -74,7 +73,7 @@ class MinioConfigureTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                is("Count objects from bucket <count-bucket-200> expected to be EXACTLY <2> but got <1> within 200 milliseconds"));
+                is("Expected EXACTLY <2> objects in bucket 'count-bucket-200', but got <1> within 200 milliseconds"));
     }
 
     @Test
@@ -93,7 +92,7 @@ class MinioConfigureTests extends MinioContainerSetup {
         MatcherAssert.assertThat(
                 "Error on assert objects count in bucket",
                 exception.getMessage(),
-                is("Count objects from bucket <count-bucket-1200> expected to be EXACTLY <2> but got <1> within 1 second 200 milliseconds"));
+                is("Expected EXACTLY <2> objects in bucket 'count-bucket-1200', but got <1> within 1 second 200 milliseconds"));
     }
 
     @Test
@@ -116,10 +115,11 @@ class MinioConfigureTests extends MinioContainerSetup {
         Throwable exception = assertThrows(MinioHelperException.class, () ->
                 minioUpload.uploadFileToBucket(bucket, fileName2, "object2.txt"));
 
-        MatcherAssert.assertThat(
-                "Error on abort file upload (max size limit)",
-                exception.getMessage(),
-                StringContains.containsString("size:<31> more maximum in config 30bytes"));
+
+        assertEquals(
+                "Upload aborted: file '%s/src/test/resources/temp/test_size_31.txt' size (31 bytes) exceeds the configured maximum (30 bytes). Use setMaxUploadSize to change the limit."
+                        .formatted(System.getProperty("user.dir")),
+                exception.getMessage());
     }
 
     @Test
@@ -142,10 +142,9 @@ class MinioConfigureTests extends MinioContainerSetup {
         Throwable exception = assertThrows(MinioHelperException.class, () ->
                 minioDownload.readObjectFromBucket(bucket, "object2.txt"));
 
-        MatcherAssert.assertThat(
-                "Error on abort object read (max size limit)",
-                exception.getMessage(),
-                StringContains.containsString("Download aborted, object <object2.txt> size:<11> more maximum in config 10bytes"));
+        assertEquals(
+                "Download aborted: file 'object2.txt' size (11 bytes) exceeds the configured maximum (10 bytes). Use setMaxDownloadFileSize to change the limit.",
+                exception.getMessage());
     }
 
     @Test
@@ -168,10 +167,10 @@ class MinioConfigureTests extends MinioContainerSetup {
         Throwable exception = assertThrows(MinioHelperException.class, () ->
                 minioDownload.downloadObjectFromBucket(bucket, "object2.txt", "temp/saved2.txt"));
 
-        MatcherAssert.assertThat(
-                "Error on abort object read (max size limit)",
-                exception.getMessage(),
-                StringContains.containsString("Download aborted, object <object2.txt> size:<11> more maximum in config 10bytes"));
+
+        assertEquals(
+                "Download aborted: file 'object2.txt' size (11 bytes) exceeds the configured maximum (10 bytes). Use setMaxDownloadFileSize to change the limit.",
+                exception.getMessage());
     }
 
 }

@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -47,9 +46,9 @@ public abstract class MinioAbstract {
     protected int port;
     protected String username;
     protected String password;
-    
+
     private MinioClient minioCl;
-    
+
     private final String resPath = getTestResourcesPath();
 
     /**
@@ -72,7 +71,7 @@ public abstract class MinioAbstract {
      */
     protected volatile int maxDownloadObjectSize = 1024 * 50;
 
-    
+
     protected MinioAbstract(String url, int port, String username, String password) {
         this.url = url;
         this.port = port;
@@ -106,7 +105,7 @@ public abstract class MinioAbstract {
                 .credentials(username, password)
                 .build();
     }
-  
+
 
     // Upload
 
@@ -128,8 +127,8 @@ public abstract class MinioAbstract {
 
         if (getResourceFileSize(filePathName) > maxUploadFileSize) {
             throw new MinioHelperException(
-                    MessageFormat.format("Upload aborted, file <{0}> size:<{1}> more maximum in config {2}bytes, can be changed by .setMaxUploadSize(int maxUploadSize)",
-                            resourceFilePath, getResourceFileSize(filePathName), maxUploadFileSize));
+                    "Upload aborted: file '%s' size (%s bytes) exceeds the configured maximum (%s bytes). Use setMaxUploadSize to change the limit."
+                            .formatted(resourceFilePath, getResourceFileSize(filePathName), maxUploadFileSize));
         }
 
         try (FileInputStream fis = new FileInputStream(resourceFilePath)) {
@@ -174,7 +173,7 @@ public abstract class MinioAbstract {
 
     // Download/Read
 
-    protected void downloadObjectBySharedLinkMethod(String urlLink, String filePath){
+    protected void downloadObjectBySharedLinkMethod(String urlLink, String filePath) {
         downloadFile(urlLink, filePath);
     }
 
@@ -231,8 +230,9 @@ public abstract class MinioAbstract {
 
     private void checkDownloadSize(String bucketName, String objectName) {
         if (getObjectSizeMethod(bucketName, objectName) > maxDownloadObjectSize) {
-            throw new MinioHelperException(MessageFormat.format("Download aborted, object <{0}> size:<{1}> more maximum in config {2}bytes, can be changed by .setMaxDownloadFileSize(int maxDownloadObjectSize)",
-                    objectName, getObjectSizeMethod(bucketName, objectName), maxDownloadObjectSize));
+            throw new MinioHelperException(
+                    "Download aborted: file '%s' size (%s bytes) exceeds the configured maximum (%s bytes). Use setMaxDownloadFileSize to change the limit."
+                            .formatted(objectName, getObjectSizeMethod(bucketName, objectName), maxDownloadObjectSize));
         }
     }
 
@@ -243,10 +243,10 @@ public abstract class MinioAbstract {
 
         try {
             minioCl.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-            logger.info("Bucket <{}> successfully created", bucketName);
+            logger.info("Bucket '{}' successfully created", bucketName);
         } catch (ErrorResponseException e) {
             if ("BucketAlreadyOwnedByYou".equals(e.errorResponse().code())) {
-                logger.info("Bucket <{}> already exist", bucketName);
+                logger.info("Bucket '{}' already exists", bucketName);
             } else {
                 throw new MinioHelperException("Error occurred: " + e.getMessage());
             }
@@ -260,20 +260,20 @@ public abstract class MinioAbstract {
 
         try {
             minioCl.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
-            logger.info("Bucket <{}> successfully deleted", bucketName);
+            logger.info("Bucket '{}' successfully deleted", bucketName);
 
         } catch (ErrorResponseException e) {
             if ("BucketNotEmpty".equals(e.errorResponse().code())) {
-                throw new MinioHelperException(String.format("Bucket <%s> not empty", bucketName), e);
+                throw new MinioHelperException(String.format("Bucket '%s' not empty", bucketName), e);
 
             } else if ("NoSuchBucket".equals(e.errorResponse().code())) {
-                throw new MinioHelperException(String.format("Bucket <%s> does not exist", bucketName), e);
+                throw new MinioHelperException(String.format("Bucket '%s' does not exist", bucketName), e);
 
             } else {
-                throw new MinioHelperException(String.format("Error occurred while delete bucket <%s>", bucketName), e);
+                throw new MinioHelperException(String.format("Error occurred while delete bucket '%s'", bucketName), e);
             }
         } catch (Exception e) {
-            throw new MinioHelperException(String.format("Error occurred while delete bucket <%s>", bucketName), e);
+            throw new MinioHelperException(String.format("Error occurred while delete bucket '%s'", bucketName), e);
         }
 
     }
@@ -284,7 +284,7 @@ public abstract class MinioAbstract {
             minioCl.removeObject(
                     RemoveObjectArgs.builder().bucket(bucketName).object(objectName).build());
 
-            logger.info("Object <{}> in <{}> successfully deleted", objectName, bucketName);
+            logger.info("Object '{}' successfully deleted from bucket '{}'", objectName, bucketName);
         } catch (Exception e) {
             throw new MinioHelperException(e);
         }
@@ -299,12 +299,12 @@ public abstract class MinioAbstract {
             int count = 0;
             for (Result<Item> result : results) {
                 Item item = result.get();
-                logger.debug("Object {} for delete", item.objectName());
+                logger.debug("Object '{}' for delete", item.objectName());
                 minioCl.removeObject(
                         RemoveObjectArgs.builder().bucket(bucketName).object(item.objectName()).build());
                 count++;
             }
-            logger.info("Objects({}) in <{}> successfully deleted", count, bucketName);
+            logger.info("Successfully deleted {} objects from bucket '{}'", count, bucketName);
         } catch (Exception e) {
             throw new MinioHelperException(e);
         }
@@ -330,7 +330,7 @@ public abstract class MinioAbstract {
                 return false;
 
             } else if ("NoSuchBucket".equals(e.errorResponse().code())) {
-                throw new MinioHelperException("Bucket <" + bucketName + "> does not exist", e);
+                throw new MinioHelperException("Bucket '%s' does not exist".formatted(bucketName), e);
 
             } else {
                 throw new MinioHelperException("Error occurred while checking object existence", e);
@@ -340,7 +340,7 @@ public abstract class MinioAbstract {
             throw new MinioHelperException("Error occurred while checking object existence", e);
         }
     }
-    
+
     protected AssertableStringList getObjectsListForAssertMethod(String bucketName) {
         return new AssertableStringList(getObjectsListArrayMethod(bucketName, true));
     }
@@ -369,8 +369,8 @@ public abstract class MinioAbstract {
         }
 
         if (allure) {
-            logger.info("Objects list in bucket <{}>:\n{}", bucketName, objectsList);
-            attachFromList(String.format("Objects(%d) list from bucket(%s):", objectsList.size(), bucketName), objectsList);
+            logger.info("Objects list in bucket '{}':\n{}", bucketName, objectsList);
+            attachFromList(String.format("Objects(%d) list from bucket '%s':", objectsList.size(), bucketName), objectsList);
         }
 
         return objectsList;
@@ -384,12 +384,12 @@ public abstract class MinioAbstract {
 
         long objectSize = getStatObjectResponse(bucketName, objectName).size();
 
-        logger.debug("Object <{}> size is: {} bytes", objectName, objectSize);
+        logger.debug("Object '{}' size is: {} bytes", objectName, objectSize);
 
         return objectSize;
 
     }
-    
+
     protected AssertableStringList getBucketsListMethod() {
 
         try {
@@ -404,7 +404,7 @@ public abstract class MinioAbstract {
                 logger.info("Buckets in MinIO:");
                 for (Bucket bucket : bucketList) {
                     actualList.add(bucket.name());
-                    logger.info("Name: {}, Created: {}", bucket.name(), bucket.creationDate());
+                    logger.info("Name: '{}', Created: {}", bucket.name(), bucket.creationDate());
                 }
             }
 
@@ -428,7 +428,7 @@ public abstract class MinioAbstract {
     }
 
     // Asserts
-    
+
     protected void seeBucketIsEmptyMethod(String bucketName, int providedAwait) {
 
         try {
@@ -440,13 +440,12 @@ public abstract class MinioAbstract {
             getObjectsListArrayMethod(bucketName, true);
 
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Bucket <{0}> expected to be empty but has {1} object/s within {2}",
-                            bucketName, getObjectsCountInBucketMethod(bucketName), formatMilliseconds(providedAwait)));
+                    "Expected bucket '%s' to be empty, but got <%d> objects within %s"
+                            .formatted(bucketName, getObjectsCountInBucketMethod(bucketName), formatMilliseconds(providedAwait)));
         }
 
     }
-    
+
     protected void seeBucketIsNotEmptyMethod(String bucketName, int providedAwait) {
 
         try {
@@ -454,13 +453,12 @@ public abstract class MinioAbstract {
                     assertNotEquals(0, getObjectsCountInBucketMethod(bucketName)));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Bucket <{0}> expected to be not empty but has no objects within {1}",
-                            bucketName, formatMilliseconds(providedAwait)));
+                    "Expected bucket '%s' to be not empty, but got no objects within %s"
+                            .formatted(bucketName, formatMilliseconds(providedAwait)));
         }
 
     }
-    
+
     protected void seeBucketExistsMethod(String bucketName, int providedAwait) {
 
         try {
@@ -468,12 +466,11 @@ public abstract class MinioAbstract {
                     assertBooleans(true, bucketExistingStatus(bucketName)));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Bucket <{0}> does not exist within {1}",
-                            bucketName, formatMilliseconds(providedAwait)));
+                    "Bucket '%s' does not exist within %s"
+                            .formatted(bucketName, formatMilliseconds(providedAwait)));
         }
     }
-    
+
     protected void seeBucketDoesNotExistMethod(String bucketName, int providedAwait) {
 
         try {
@@ -481,12 +478,11 @@ public abstract class MinioAbstract {
                     assertBooleans(false, bucketExistingStatus(bucketName)));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Bucket <{0}> unexpected exists within {1}",
-                            bucketName, formatMilliseconds(providedAwait)));
+                    "Bucket '%s' unexpectedly exists within %s"
+                            .formatted(bucketName, formatMilliseconds(providedAwait)));
         }
     }
-    
+
     protected void seeObjectExistsMethod(String bucketName, String objectName, int providedAwait) {
 
         try {
@@ -494,12 +490,12 @@ public abstract class MinioAbstract {
                     assertBooleans(true, objectExistsStatusMethod(bucketName, objectName)));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Object <{0}> does not exist in bucket <{1}> within {2}",
-                            objectName, bucketName, formatMilliseconds(providedAwait)));
+
+                    "Object '%s' does not exist in bucket '%s' within %s"
+                            .formatted(objectName, bucketName, formatMilliseconds(providedAwait)));
         }
     }
-    
+
     protected void seeObjectDoesNotExistMethod(String bucketName, String objectName, int providedAwait) {
 
         try {
@@ -507,13 +503,12 @@ public abstract class MinioAbstract {
                     assertBooleans(false, objectExistsStatusMethod(bucketName, objectName)));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Object <{0}> exists in bucket <{1}> within {2}",
-                            objectName, bucketName, formatMilliseconds(providedAwait)));
+                    "Object '%s' exists in bucket '%s' within %s"
+                            .formatted(objectName, bucketName, formatMilliseconds(providedAwait)));
         }
 
     }
-    
+
     protected void seeObjectsCountIsExactlyMethod(String bucketName, int expectedCount, int providedAwait) {
 
         try {
@@ -521,13 +516,12 @@ public abstract class MinioAbstract {
                     assertIntEquals(expectedCount, getObjectsListArrayNoReportMethod(bucketName).size()));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Count objects from bucket <{0}> expected to be EXACTLY <{1}> but got <{2}> within {3}",
-                            bucketName, expectedCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
+                    "Expected EXACTLY <%d> objects in bucket '%s', but got <%d> within %s"
+                            .formatted(expectedCount, bucketName, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
         }
 
     }
-    
+
     protected void seeObjectsCountIsGreaterThanMethod(String bucketName, int minCount, int providedAwait) {
 
         try {
@@ -535,12 +529,11 @@ public abstract class MinioAbstract {
                     assertGreaterThanExpected(minCount, getObjectsListArrayNoReportMethod(bucketName).size()));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Count objects from bucket <{0}> expected to be GREATER than <{1}> but got <{2}> within {3}",
-                            bucketName, minCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
+                    "Expected the number of objects in bucket '%s' to be GREATER than <%d>, but got <%d> within %s"
+                            .formatted(bucketName, minCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
         }
     }
-    
+
     protected void seeObjectsCountIsLessThanMethod(String bucketName, int maxCount, int providedAwait) {
 
         try {
@@ -548,40 +541,41 @@ public abstract class MinioAbstract {
                     assertLessThanExpected(maxCount, getObjectsListArrayNoReportMethod(bucketName).size()));
         } catch (ConditionTimeoutException e) {
             throw new AssertionError(
-                    MessageFormat.format(
-                            "Count objects from bucket <{0}> expected to be LESS than <{1}> but got <{2}> within {3}",
-                            bucketName, maxCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
+                    "Expected the number of objects in bucket '%s' to be LESS than <%d>, but got <%d> within %s"
+                            .formatted(bucketName, maxCount, getObjectsListArrayNoReportMethod(bucketName).size(), formatMilliseconds(providedAwait)));
         }
 
     }
-    
+
     protected void seeObjectSizeExactlyMethod(String bucketName, String objectName, long expectedSize) {
         assertEquals(
                 expectedSize,
                 getObjectSizeMethod(bucketName, objectName),
-                MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be equal <{2}> but got <{3}>",
-                        objectName, bucketName, formatBytes(expectedSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
+                "Object '%s' size in bucket '%s' expected to be EXACTLY <%s>, but got <%s>"
+                        .formatted(objectName, bucketName, formatBytes(expectedSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
     }
-    
+
     protected void seeObjectSizeIsGreaterThanMethod(String bucketName, String objectName, long minSize) {
 
         try {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) > minSize);
         } catch (AssertionError e) {
-            throw new AssertionError(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be greater <{2}> but got <{3}>",
-                    objectName, bucketName, formatBytes(minSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
+            throw new AssertionError(
+                    "Object '%s' size in bucket '%s' expected to be GREATER <%s>, but got <%s>"
+                            .formatted(objectName, bucketName, formatBytes(minSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
     }
-    
+
     protected void seeObjectSizeIsLessThanMethod(String bucketName, String objectName, long maxSize) {
 
         try {
             Assertions.assertTrue(
                     getObjectSizeMethod(bucketName, objectName) < maxSize);
         } catch (AssertionError e) {
-            throw new AssertionError(MessageFormat.format("Object <{0}> size from bucket <{1}> expected to be less <{2}> but got <{3}>",
-                    objectName, bucketName, formatBytes(maxSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
+            throw new AssertionError(
+                    "Object '%s' size in bucket '%s' expected to be LESS <%s>, but got <%s>"
+                            .formatted(objectName, bucketName, formatBytes(maxSize), formatBytes(getObjectSizeMethod(bucketName, objectName))));
         }
     }
 

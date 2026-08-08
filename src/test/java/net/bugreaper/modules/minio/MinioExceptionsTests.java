@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 import testcontainers.MinioContainerSetup;
 
-import java.text.MessageFormat;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -44,7 +43,7 @@ class MinioExceptionsTests extends MinioContainerSetup {
                 minio.objectExistsStatus(bucketName, "object.txt"));
 
         assertEquals(
-                MessageFormat.format("Bucket <{0}> does not exist", bucketName),
+                "Bucket 'my-bucket-wrong' does not exist",
                 exception.getMessage(),
                 "Error on check object in tot existing bucket");
     }
@@ -86,7 +85,7 @@ class MinioExceptionsTests extends MinioContainerSetup {
                 minio.deleteEmptyBucket(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> not empty", bucket),
+                String.format("Bucket '%s' not empty", bucket),
                 exception.getMessage(),
                 "Error on try delete not empty bucket");
     }
@@ -99,7 +98,7 @@ class MinioExceptionsTests extends MinioContainerSetup {
                 minio.deleteEmptyBucket(bucket));
 
         assertEquals(
-                String.format("Bucket <%s> does not exist", bucket),
+                String.format("Bucket '%s' does not exist", bucket),
                 exception.getMessage(),
                 "Error on try delete not empty bucket");
     }
