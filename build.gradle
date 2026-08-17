@@ -8,7 +8,7 @@ plugins {
 }
 
 
-description = 'BugReaper module for interaction with Minio'
+description = 'Is part of the BugReaper JAVA test helper framework that simplifies file storage interaction with MINIO in automated tests.'
 
 group = 'net.bugreaper'
 version = properties["VERSION_NAME"].toString()
@@ -48,9 +48,9 @@ repositories {
 }
 
 dependencies {
-    api 'net.bugreaper:core:1.4.3'
+    api 'net.bugreaper:core:1.4.4'
 
-    api 'io.minio:minio:8.6.0'
+    api 'io.minio:minio:9.0.3'
 
     implementation 'org.apiguardian:apiguardian-api:1.1.2'
 

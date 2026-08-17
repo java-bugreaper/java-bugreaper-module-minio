@@ -5,5 +5,6 @@ modules:
     username: admin
     password: password
     await: 1000 # optional
+    await-poll-interval: 200 # optional
     max-upload-file-size: 1024 # optional
     max-download-file-size: 2048 # optional

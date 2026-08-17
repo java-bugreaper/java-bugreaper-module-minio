@@ -118,6 +118,10 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig, Minio
         if (awaitVal instanceof Number number) {
             setAwaitMs(number.intValue());
         }
+        Object awaitPollIntervalVal = YamlUtils.getValueByPath("modules.minio.await-poll-interval", true);
+        if (awaitPollIntervalVal instanceof Number number) {
+            this.awaitPollInterval = number.intValue();
+        }
         Object maxUploadFileSizeVal = YamlUtils.getValueByPath("modules.minio.max-upload-file-size", true);
         if (maxUploadFileSizeVal instanceof Number number) {
             setMaxUploadSize(number.intValue());
@@ -187,11 +191,12 @@ public class Minio extends MinioAbstract implements MinioInt, MinioConfig, Minio
                             username=%s
                             password=%s
                             awaitMs=%d
+                            awaitPollInterval=%d
                             downloadBufferSize=%d
                             maxUploadFileSize=%d
                             maxDownloadObjectSize=%d%n""",
                 this.getClass().getSimpleName(), url, port, username, password,
-                awaitMs, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
+                awaitMs, awaitPollInterval, downloadBufferSize, maxUploadFileSize, maxDownloadObjectSize);
 
         logger.info(info);
         return info;
