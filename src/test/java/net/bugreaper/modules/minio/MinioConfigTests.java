@@ -24,28 +24,23 @@ class MinioConfigTests extends MinioContainerSetup {
 
     private static final String CI = System.getenv("CI");
     private static final String PROPERTY = "bugreaperEnv";
-    private String expectedUrl;
+    private static String expectedUrl;
 
 
     @BeforeAll
     static void createDefaultBucket() {
         minio.createBucket(DEFAULT_BUCKET);
+        if(Objects.equals(CI, "true")){
+            expectedUrl = "http://docker";
+        }else {
+            expectedUrl = "http://localhost";
+        }
+        YamlUtils.clearCache();
     }
 
     @BeforeEach
     void cleanBucket() {
         minio.cleanBucket(DEFAULT_BUCKET);
-    }
-
-
-    @BeforeEach
-     void getCi(){
-        if(Objects.equals(CI, "true")){
-            this.expectedUrl = "http://docker";
-        }else {
-            this.expectedUrl = "http://localhost";
-        }
-        YamlUtils.clearCache();
     }
 
     @Test
@@ -68,6 +63,7 @@ class MinioConfigTests extends MinioContainerSetup {
                             username=admin
                             password=password
                             awaitMs=1000
+                            awaitPollInterval=200
                             downloadBufferSize=10240
                             maxUploadFileSize=1024
                             maxDownloadObjectSize=2048
@@ -91,6 +87,7 @@ class MinioConfigTests extends MinioContainerSetup {
                             username=admin
                             password=password
                             awaitMs=2000
+                            awaitPollInterval=100
                             downloadBufferSize=10240
                             maxUploadFileSize=20480
                             maxDownloadObjectSize=51200
@@ -113,6 +110,7 @@ class MinioConfigTests extends MinioContainerSetup {
                             username=admin
                             password=password
                             awaitMs=2000
+                            awaitPollInterval=100
                             downloadBufferSize=10240
                             maxUploadFileSize=20480
                             maxDownloadObjectSize=51200

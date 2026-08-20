@@ -38,14 +38,14 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(200).seeBucketIsEmpty(bucket));
 
         assertEquals(
-                String.format("Expected bucket '%s' to be empty, but got <2> objects within 200 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be EMPTY, but got <2> objects within 200 milliseconds", bucket),
                 exception1.getMessage());
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketIsEmpty(bucket));
 
         assertEquals(
-                String.format("Expected bucket '%s' to be empty, but got <2> objects within 300 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be EMPTY, but got <2> objects within 300 milliseconds", bucket),
                 exception2.getMessage());
     }
 
@@ -60,14 +60,14 @@ class MinioAssertsCatchTests extends MinioContainerSetup {
                 minioFastAwait.withAwaitMs(210).seeBucketIsNotEmpty(bucket));
 
         assertEquals(
-                String.format("Expected bucket '%s' to be not empty, but got no objects within 210 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be NOT EMPTY, but got no objects within 210 milliseconds", bucket),
                 exception1.getMessage());
 
         Throwable exception2 = assertThrows(AssertionError.class, () ->
                 minioFastAwait.seeBucketIsNotEmpty(bucket));
 
         assertEquals(
-                String.format("Expected bucket '%s' to be not empty, but got no objects within 300 milliseconds", bucket),
+                String.format("Expected bucket '%s' to be NOT EMPTY, but got no objects within 300 milliseconds", bucket),
                 exception2.getMessage());
     }
 
